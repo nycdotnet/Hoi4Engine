@@ -70,6 +70,7 @@
         
         public decimal InfantryEquipment { get; set; }
         public decimal Artillery { get; set; }
+        public decimal AntiAir { get; set; }
 
 
         public BatallionKind Kind { get; set; }

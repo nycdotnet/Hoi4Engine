@@ -150,8 +150,19 @@
         public decimal FuelCapacity => AllBatallions().Sum(b => b.FuelCapacity);
         public decimal FuelUsage => AllBatallions().Sum(b => b.FuelUsage);
 
+        /// <summary>
+        /// The amount of Infantry equipment required by this division
+        /// </summary>
         public decimal InfantryEquipment => AllBatallions().Sum(b => b.InfantryEquipment);
+        /// <summary>
+        /// The amount of Artillery equipment required by this division
+        /// </summary>
         public decimal Artillery => AllBatallions().Sum(b => b.Artillery);
+        /// <summary>
+        /// The amount of Anti-Air equipment required by this division
+        /// </summary>
+        public decimal AntiAir => AllBatallions().Sum(b => b.AntiAir);
+
         public decimal ProductionCost => AllBatallions().Sum(b => b.ProductionCost);
 
     }
