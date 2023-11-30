@@ -228,6 +228,48 @@ namespace Hoi4EngineTests
         }
 
         [Fact]
+        public void OneInfantryOneArtillerySupportCompanyHasExpectedStats()
+        {
+            var template = new DivisionTemplate();
+            template.AddToBrigade1(new InfantryBatallion());
+            template.AddSupportCompany(new ArtillerySupportCompany());
+
+            template.MaxSpeed.Should().Be(4);
+            template.HP.Should().Be(25.2m);
+            template.Organization.Should().Be(30);
+            template.RecoveryRate.Should().Be(0.2m);
+            template.Reconnaisance.Should().Be(0);
+            template.Suppression.Should().Be(1.5m);
+            template.Weight.Should().Be(0.6m);
+            template.SupplyUse.Should().Be(0.22m);
+            template.AverageReliability.Should().Be(0.85m);
+            template.ReliabilityBonus.Should().Be(0);
+            template.TricklebackAndWarSupportProtection.Should().Be(0);
+            template.ExperienceLoss.Should().Be(0);
+
+            template.SoftAttack.Should().Be(21);
+            template.HardAttack.Should().Be(2.2m);
+            template.AirAttack.Should().Be(0);
+            template.Defense.Should().Be(28);
+            template.Breakthrough.Should().Be(6.6m);
+            template.Armor.Should().Be(0);
+            template.Piercing.Should().Be(4.7m);
+            template.Initiative.Should().Be(0);
+            template.Entrenchment.Should().Be(0);
+            template.EquipmentCaptureRatio.Should().Be(0);
+
+            template.Manpower.Should().Be(1300);
+            template.TrainingTime.Should().Be(120);
+            template.FuelUsage.Should().Be(0);
+            template.FuelCapacity.Should().Be(0);
+            template.InfantryEquipment.Should().Be(100);
+            template.Artillery.Should().Be(12);
+            template.ProductionCost.Should().Be(92);
+            template.CombatWidth.Should().Be(2);
+        }
+
+
+        [Fact]
         public void ClassicSevenTwoHasExpectedStats()
         {
             var template = new DivisionTemplate();
@@ -272,6 +314,65 @@ namespace Hoi4EngineTests
             template.InfantryEquipment.Should().Be(700);
             template.Artillery.Should().Be(72);
             template.ProductionCost.Should().Be(602);
+            template.CombatWidth.Should().Be(20);
+        }
+
+        [Fact]
+        public void CanNotAddDuplicateSupportCompanies()
+        {
+            var template = new DivisionTemplate();
+            template.AddSupportCompany(new EngineerSupportCompany());
+            var act = () => template.AddSupportCompany(new EngineerSupportCompany());
+            act.Should().Throw<InvalidOperationException>().WithMessage("This division already has a(n) EngineerSupportCompany.");
+        }
+
+        [Fact]
+        public void ClassicSevenTwoWithEngineerHasExpectedStats()
+        {
+            var template = new DivisionTemplate();
+            template.AddToBrigade1(new InfantryBatallion());
+            template.AddToBrigade1(new InfantryBatallion());
+            template.AddToBrigade1(new InfantryBatallion());
+            template.AddToBrigade1(new InfantryBatallion());
+            template.AddToBrigade2(new InfantryBatallion());
+            template.AddToBrigade2(new InfantryBatallion());
+            template.AddToBrigade2(new InfantryBatallion());
+            template.AddToBrigade3(new ArtilleryBatallion());
+            template.AddToBrigade3(new ArtilleryBatallion());
+            template.AddSupportCompany(new EngineerSupportCompany());
+
+            template.MaxSpeed.Should().Be(4);
+            template.HP.Should().Be(178.2m);
+            template.Organization.Should().Be(44);
+            template.RecoveryRate.Should().Be(0.26m);
+            template.Reconnaisance.Should().Be(0);
+            template.Suppression.Should().Be(10.5m);
+            template.Weight.Should().Be(4.6m);
+            template.SupplyUse.Should().Be(0.86m);
+            template.AverageReliability.Should().Be(0.875m);
+            template.ReliabilityBonus.Should().Be(0);
+            template.TricklebackAndWarSupportProtection.Should().Be(0);
+            template.ExperienceLoss.Should().Be(0);
+
+            template.SoftAttack.Should().Be(95);
+            template.HardAttack.Should().Be(12);
+            template.AirAttack.Should().Be(0);
+            template.Defense.Should().Be(198.2m);
+            template.Breakthrough.Should().Be(37.5m);
+            template.Armor.Should().Be(0);
+            template.Piercing.Should().Be(4.5m);
+            template.Initiative.Should().Be(0);
+            template.Entrenchment.Should().Be(3.4m);
+            template.EquipmentCaptureRatio.Should().Be(0);
+
+            template.Manpower.Should().Be(8300);
+            template.TrainingTime.Should().Be(120);
+            template.FuelUsage.Should().Be(0);
+            template.FuelCapacity.Should().Be(0);
+            template.InfantryEquipment.Should().Be(710);
+            template.Artillery.Should().Be(72);
+            template.SupportEquipment.Should().Be(30);
+            template.ProductionCost.Should().Be(727);
             template.CombatWidth.Should().Be(20);
         }
 

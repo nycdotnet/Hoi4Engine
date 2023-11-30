@@ -19,6 +19,7 @@
             InfantryEquipment = 10;
             SupportEquipment = 30;
             ProductionCost = 125;
+            RecoveryRate = 0.3m;
         }
     }
 }

@@ -11,6 +11,11 @@
 
         public void AddSupportCompany(SupportCompany batallion)
         {
+            var type = batallion.GetType();
+            if (supportCompanies.Any(sc => sc.GetType() == type))
+            {
+                throw new InvalidOperationException($"This division already has a(n) {type.Name}.");
+            }
             AddToBrigade(batallion, supportCompanies);
         }
         public void AddToBrigade1(Batallion batallion)
@@ -112,7 +117,7 @@
         /// <summary>
         /// This stat is additional recovery rate on top of the base recovery rate.
         /// </summary>
-        public decimal RecoveryRate => Math.Round(AllBatallions().Average(b => b.RecoveryRate), 2, MidpointRounding.ToZero);
+        public decimal RecoveryRate => Math.Round(AllBatallionsAndSupportCompanies().Average(b => b.RecoveryRate), 2, MidpointRounding.ToZero);
         /// <summary>
         /// Note typically this will only be gained by a recon support company, so it may
         /// not be needed to sum the regular batallions.
@@ -155,7 +160,9 @@
             get
             {
                 var maxPiercingUnit = AllBatallionsAndSupportCompanies().Max(b => b.Piercing);
-                var avgPiercing = AllBatallions().Average(b => b.Piercing);
+                var avgPiercing = AllBatallionsAndSupportCompanies()
+                    .Where(b => b.Piercing != 0)
+                    .Average(b => b.Piercing);
                 return Math.Round((maxPiercingUnit * 0.4m) + (avgPiercing * 0.6m), 1, MidpointRounding.ToZero);
             }
         }
