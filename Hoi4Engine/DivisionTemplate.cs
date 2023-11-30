@@ -70,6 +70,30 @@
             {
                 yield return brigade5[i];
             }
+        }
+
+        private IEnumerable<Batallion> AllBatallionsAndSupportCompanies()
+        {
+            for (var i = 0; i < brigade1.Count; i++)
+            {
+                yield return brigade1[i];
+            }
+            for (var i = 0; i < brigade2.Count; i++)
+            {
+                yield return brigade2[i];
+            }
+            for (var i = 0; i < brigade3.Count; i++)
+            {
+                yield return brigade3[i];
+            }
+            for (var i = 0; i < brigade4.Count; i++)
+            {
+                yield return brigade4[i];
+            }
+            for (var i = 0; i < brigade5.Count; i++)
+            {
+                yield return brigade5[i];
+            }
             for (var i = 0; i < supportCompanies.Count; i++)
             {
                 yield return supportCompanies[i];
@@ -79,12 +103,12 @@
 
         public decimal MaxSpeed => AllBatallions().Min(b => b.MaxSpeed);
 
-        public decimal HP => AllBatallions().Sum(b => b.HP);
+        public decimal HP => AllBatallionsAndSupportCompanies().Sum(b => b.HP);
 
         /// <summary>
         /// https://hoi4.paradoxwikis.com/Land_units#Base_stats
         /// </summary>
-        public decimal Organization => Math.Round(AllBatallions().Average(b => b.Organization), 1, MidpointRounding.ToZero);
+        public decimal Organization => Math.Round(AllBatallionsAndSupportCompanies().Average(b => b.Organization), 1, MidpointRounding.ToZero);
         /// <summary>
         /// This stat is additional recovery rate on top of the base recovery rate.
         /// </summary>
@@ -95,12 +119,12 @@
         /// </summary>
         public decimal Reconnaisance => AllBatallions().Sum(b => b.Reconnaisance);
         public decimal Suppression => AllBatallions().Sum(b => b.Suppression);
-        public decimal Weight => AllBatallions().Sum(b => b.Weight);
-        public decimal SupplyUse => AllBatallions().Sum(b => b.SupplyUse);
+        public decimal Weight => AllBatallionsAndSupportCompanies().Sum(b => b.Weight);
+        public decimal SupplyUse => AllBatallionsAndSupportCompanies().Sum(b => b.SupplyUse);
         /// <summary>
         /// Percentage - between 0 and 1
         /// </summary>
-        public decimal AverageReliability => Math.Round(AllBatallions().Average(b => b.AverageReliability), 3, MidpointRounding.ToZero);
+        public decimal AverageReliability => Math.Round(AllBatallionsAndSupportCompanies().Average(b => b.AverageReliability), 3, MidpointRounding.ToZero);
         /// <summary>
         /// Percentage - between 0 and 1
         /// </summary>
@@ -114,15 +138,15 @@
         /// </summary>
         public decimal ExperienceLoss => AllBatallions().Average(b => b.ExperienceLoss);
 
-        public decimal SoftAttack => AllBatallions().Sum(b => b.SoftAttack);
-        public decimal HardAttack => AllBatallions().Sum(b => b.HardAttack);
-        public decimal AirAttack => AllBatallions().Sum(b => b.AirAttack);
-        public decimal Defense => AllBatallions().Sum(b => b.Defense);
-        public decimal Breakthrough => AllBatallions().Sum(b => b.Breakthrough);
+        public decimal SoftAttack => AllBatallionsAndSupportCompanies().Sum(b => b.SoftAttack);
+        public decimal HardAttack => AllBatallionsAndSupportCompanies().Sum(b => b.HardAttack);
+        public decimal AirAttack => AllBatallionsAndSupportCompanies().Sum(b => b.AirAttack);
+        public decimal Defense => AllBatallionsAndSupportCompanies().Sum(b => b.Defense);
+        public decimal Breakthrough => AllBatallionsAndSupportCompanies().Sum(b => b.Breakthrough);
         public decimal Armor {
             get {
-                var maxArmorUnit = AllBatallions().Max(b => b.Armor);
-                var avgArmor = AllBatallions().Average(b => b.Armor);
+                var maxArmorUnit = AllBatallionsAndSupportCompanies().Max(b => b.Armor);
+                var avgArmor = AllBatallionsAndSupportCompanies().Average(b => b.Armor);
                 return (maxArmorUnit * 0.4m) + (avgArmor * 0.6m);
             }
         }
@@ -130,40 +154,59 @@
         {
             get
             {
-                var maxPiercingUnit = AllBatallions().Max(b => b.Piercing);
+                var maxPiercingUnit = AllBatallionsAndSupportCompanies().Max(b => b.Piercing);
                 var avgPiercing = AllBatallions().Average(b => b.Piercing);
                 return Math.Round((maxPiercingUnit * 0.4m) + (avgPiercing * 0.6m), 1, MidpointRounding.ToZero);
             }
         }
 
+        public decimal Initiative => AllBatallionsAndSupportCompanies().Average(b => b.Initiative);
+
         // NOTE: Definitely not correct - need to consider engineers which modify leg infantry only.
-        public decimal Entrenchment => AllBatallions().Sum(b => b.Entrenchment);
+        public decimal Entrenchment
+        {
+            get
+            {
+                var legInfantryBonus = 0m;
+                var engCo = supportCompanies.FirstOrDefault(c => c is EngineerSupportCompany);
+                if (engCo is not null)
+                {
+                    legInfantryBonus += 0.2m;
+                }
+                return AllBatallionsAndSupportCompanies()
+                    .Sum(b => b is { IsLegInfantry: true } ? b.Entrenchment + legInfantryBonus : b.Entrenchment);
+            }
+        }
         // NOTE: Def wrong - need to consider maint cos and probably not sum.
-        public decimal EquipmentCaptureRatio => AllBatallions().Sum(b => b.EquipmentCaptureRatio);
+        public decimal EquipmentCaptureRatio => AllBatallionsAndSupportCompanies().Sum(b => b.EquipmentCaptureRatio);
         public decimal CombatWidth => AllBatallions().Sum(b => b.CombatWidth);
-        public decimal Manpower => AllBatallions().Sum(b => b.Manpower);
+        public decimal Manpower => AllBatallionsAndSupportCompanies().Sum(b => b.Manpower);
         /// <summary>
         /// In Days
         /// </summary>
-        public decimal TrainingTime => AllBatallions().Max(b => b.TrainingTime);
+        public decimal TrainingTime => AllBatallionsAndSupportCompanies().Max(b => b.TrainingTime);
 
-        public decimal FuelCapacity => AllBatallions().Sum(b => b.FuelCapacity);
-        public decimal FuelUsage => AllBatallions().Sum(b => b.FuelUsage);
+        public decimal FuelCapacity => AllBatallionsAndSupportCompanies().Sum(b => b.FuelCapacity);
+        public decimal FuelUsage => AllBatallionsAndSupportCompanies().Sum(b => b.FuelUsage);
 
         /// <summary>
         /// The amount of Infantry equipment required by this division
         /// </summary>
-        public decimal InfantryEquipment => AllBatallions().Sum(b => b.InfantryEquipment);
+        public decimal InfantryEquipment => AllBatallionsAndSupportCompanies().Sum(b => b.InfantryEquipment);
         /// <summary>
         /// The amount of Artillery equipment required by this division
         /// </summary>
-        public decimal Artillery => AllBatallions().Sum(b => b.Artillery);
+        public decimal Artillery => AllBatallionsAndSupportCompanies().Sum(b => b.Artillery);
         /// <summary>
         /// The amount of Anti-Air equipment required by this division
         /// </summary>
-        public decimal AntiAir => AllBatallions().Sum(b => b.AntiAir);
+        public decimal AntiAir => AllBatallionsAndSupportCompanies().Sum(b => b.AntiAir);
+        /// <summary>
+        /// The amount of Support equipment required by this division
+        /// </summary>
+        public decimal SupportEquipment => AllBatallionsAndSupportCompanies().Sum(b => b.SupportEquipment);
 
-        public decimal ProductionCost => AllBatallions().Sum(b => b.ProductionCost);
+        public decimal ProductionCost => AllBatallionsAndSupportCompanies().Sum(b => b.ProductionCost);
 
     }
 }

@@ -34,6 +34,7 @@
             InfantryEquipment = 100;
             ProductionCost = 50;
             Kind = BatallionKind.Infantry;
+            IsLegInfantry = true;
         }
     }
 }

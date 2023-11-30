@@ -31,6 +31,7 @@ namespace Hoi4EngineTests
             template.Breakthrough.Should().Be(3);
             template.Armor.Should().Be(0);
             template.Piercing.Should().Be(4);
+            template.Initiative.Should().Be(0);
             template.Entrenchment.Should().Be(0);
             template.EquipmentCaptureRatio.Should().Be(0);
             template.Manpower.Should().Be(1000);
@@ -69,6 +70,7 @@ namespace Hoi4EngineTests
             template.Breakthrough.Should().Be(6);
             template.Armor.Should().Be(0);
             template.Piercing.Should().Be(4);
+            template.Initiative.Should().Be(0);
             template.Entrenchment.Should().Be(0);
             template.EquipmentCaptureRatio.Should().Be(0);
 
@@ -130,6 +132,7 @@ namespace Hoi4EngineTests
             template.Breakthrough.Should().Be(6);
             template.Armor.Should().Be(0);
             template.Piercing.Should().Be(4);
+            template.Initiative.Should().Be(0);
             template.Entrenchment.Should().Be(0);
             template.EquipmentCaptureRatio.Should().Be(0);
 
@@ -169,6 +172,7 @@ namespace Hoi4EngineTests
             template.Breakthrough.Should().Be(4);
             template.Armor.Should().Be(0);
             template.Piercing.Should().Be(18.7m);
+            template.Initiative.Should().Be(0);
             template.Entrenchment.Should().Be(0);
             template.EquipmentCaptureRatio.Should().Be(0);
 
@@ -209,6 +213,7 @@ namespace Hoi4EngineTests
             template.Breakthrough.Should().Be(9);
             template.Armor.Should().Be(0);
             template.Piercing.Should().Be(4.7m);
+            template.Initiative.Should().Be(0);
             template.Entrenchment.Should().Be(0);
             template.EquipmentCaptureRatio.Should().Be(0);
 
@@ -256,6 +261,7 @@ namespace Hoi4EngineTests
             template.Breakthrough.Should().Be(33);
             template.Armor.Should().Be(0);
             template.Piercing.Should().Be(4.5m);
+            template.Initiative.Should().Be(0);
             template.Entrenchment.Should().Be(0);
             template.EquipmentCaptureRatio.Should().Be(0);
 
@@ -312,6 +318,7 @@ namespace Hoi4EngineTests
             template.Breakthrough.Should().Be(66);
             template.Armor.Should().Be(0);
             template.Piercing.Should().Be(4.5m);
+            template.Initiative.Should().Be(0);
             template.Entrenchment.Should().Be(0);
             template.EquipmentCaptureRatio.Should().Be(0);
 
@@ -324,5 +331,47 @@ namespace Hoi4EngineTests
             template.ProductionCost.Should().Be(1204);
             template.CombatWidth.Should().Be(40);
         }
+
+        [Fact]
+        public void OneInfantryBatallionWithEngineerHasExpectedStats()
+        {
+            var template = new DivisionTemplate();
+            template.AddToBrigade1(new InfantryBatallion());
+            template.AddSupportCompany(new EngineerSupportCompany());
+
+            template.MaxSpeed.Should().Be(4);
+            template.HP.Should().Be(27.0m);
+            template.Organization.Should().Be(40);
+            template.RecoveryRate.Should().Be(0.3m);
+            template.Reconnaisance.Should().Be(0);
+            template.Suppression.Should().Be(1.5m);
+            template.Weight.Should().Be(0.6m);
+            template.SupplyUse.Should().Be(0.08m);
+            template.AverageReliability.Should().Be(0.875m);
+            template.ReliabilityBonus.Should().Be(0);
+            template.TricklebackAndWarSupportProtection.Should().Be(0);
+            template.ExperienceLoss.Should().Be(0);
+
+            template.SoftAttack.Should().Be(9);
+            template.HardAttack.Should().Be(2);
+            template.AirAttack.Should().Be(0);
+            template.Defense.Should().Be(46.2m);
+            template.Breakthrough.Should().Be(7.5m);
+            template.Armor.Should().Be(0);
+            template.Piercing.Should().Be(4);
+            template.Initiative.Should().Be(0);
+            template.Entrenchment.Should().Be(2.2m);
+            template.EquipmentCaptureRatio.Should().Be(0);
+
+            template.Manpower.Should().Be(1300);
+            template.TrainingTime.Should().Be(120);
+            template.FuelUsage.Should().Be(0);
+            template.FuelCapacity.Should().Be(0);
+            template.InfantryEquipment.Should().Be(110);
+            template.SupportEquipment.Should().Be(30);
+            template.ProductionCost.Should().Be(175);
+            template.CombatWidth.Should().Be(2);
+        }
+
     }
 }
