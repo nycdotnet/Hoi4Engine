@@ -7,12 +7,12 @@
             MaxSpeed = 4;
             HP = 25;
             Organization = 60;
-            RecoveryRate = 0.3f;
+            RecoveryRate = 0.3m;
             Reconnaisance = 0;
-            Suppression = 1.5f;
-            Weight = 0.5f;
-            SupplyUse = 0.06f;
-            AverageReliability = 0.9f;
+            Suppression = 1.5m;
+            Weight = 0.5m;
+            SupplyUse = 0.06m;
+            AverageReliability = 0.9m;
             ReliabilityBonus = 0;
             TricklebackAndWarSupportProtection = 0;
             ExperienceLoss = 0;

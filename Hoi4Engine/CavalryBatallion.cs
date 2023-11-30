@@ -4,15 +4,15 @@
     {
         public CavalryBatallion()
         {
-            MaxSpeed = 6.4f;
+            MaxSpeed = 6.4m;
             HP = 25;
             Organization = 70;
-            RecoveryRate = 0.3f;
+            RecoveryRate = 0.3m;
             Reconnaisance = 0;
-            Suppression = 2.0f;
-            Weight = 0.5f;
-            SupplyUse = 0.06f;
-            AverageReliability = 0.9f;
+            Suppression = 2.0m;
+            Weight = 0.5m;
+            SupplyUse = 0.06m;
+            AverageReliability = 0.9m;
             ReliabilityBonus = 0;
             TricklebackAndWarSupportProtection = 0;
             ExperienceLoss = 0;

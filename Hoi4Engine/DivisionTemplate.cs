@@ -2,12 +2,12 @@
 {
     public class DivisionTemplate
     {
-        private List<Batallion> brigade1 = new(5);
-        private List<Batallion> brigade2 = new(5);
-        private List<Batallion> brigade3 = new(5);
-        private List<Batallion> brigade4 = new(5);
-        private List<Batallion> brigade5 = new(5);
-        private List<SupportCompany> supportCompanies = new(5);
+        private readonly List<Batallion> brigade1 = new(5);
+        private readonly List<Batallion> brigade2 = new(5);
+        private readonly List<Batallion> brigade3 = new(5);
+        private readonly List<Batallion> brigade4 = new(5);
+        private readonly List<Batallion> brigade5 = new(5);
+        private readonly List<SupportCompany> supportCompanies = new(5);
 
         public void AddSupportCompany(SupportCompany batallion)
         {
@@ -34,7 +34,7 @@
             AddToBrigade(batallion, brigade5);
         }
 
-        private void AddToBrigade<TBattalion>(TBattalion batallion, List<TBattalion> brigade) where TBattalion: Batallion
+        private static void AddToBrigade<TBattalion>(TBattalion batallion, List<TBattalion> brigade) where TBattalion: Batallion
         {
             if (brigade.Count >= 5)
             {
@@ -77,81 +77,82 @@
         }
 
 
-        public float MaxSpeed => AllBatallions().Min(b => b.MaxSpeed);
+        public decimal MaxSpeed => AllBatallions().Min(b => b.MaxSpeed);
 
-        public float HP => AllBatallions().Sum(b => b.HP);
+        public decimal HP => AllBatallions().Sum(b => b.HP);
 
         /// <summary>
         /// https://hoi4.paradoxwikis.com/Land_units#Base_stats
         /// </summary>
-        public float Organization => AllBatallions().Average(b => b.Organization);
+        public decimal Organization => Math.Round(AllBatallions().Average(b => b.Organization), 1, MidpointRounding.ToZero);
         /// <summary>
         /// This stat is additional recovery rate on top of the base recovery rate.
         /// </summary>
-        public float RecoveryRate => AllBatallions().Average(b => b.RecoveryRate);
+        public decimal RecoveryRate => Math.Round(AllBatallions().Average(b => b.RecoveryRate), 2, MidpointRounding.ToZero);
         /// <summary>
         /// Note typically this will only be gained by a recon support company, so it may
         /// not be needed to sum the regular batallions.
         /// </summary>
-        public float Reconnaisance => AllBatallions().Sum(b => b.Reconnaisance);
-        public float Suppression => AllBatallions().Sum(b => b.Suppression);
-        public float Weight => AllBatallions().Sum(b => b.Weight);
-        public float SupplyUse => AllBatallions().Sum(b => b.SupplyUse);
+        public decimal Reconnaisance => AllBatallions().Sum(b => b.Reconnaisance);
+        public decimal Suppression => AllBatallions().Sum(b => b.Suppression);
+        public decimal Weight => AllBatallions().Sum(b => b.Weight);
+        public decimal SupplyUse => AllBatallions().Sum(b => b.SupplyUse);
         /// <summary>
         /// Percentage - between 0 and 1
         /// </summary>
-        public float AverageReliability => AllBatallions().Average(b => b.AverageReliability);
+        public decimal AverageReliability => Math.Round(AllBatallions().Average(b => b.AverageReliability), 3, MidpointRounding.ToZero);
         /// <summary>
         /// Percentage - between 0 and 1
         /// </summary>
-        public float ReliabilityBonus => AllBatallions().Average(b => b.ReliabilityBonus);
+        public decimal ReliabilityBonus => AllBatallions().Average(b => b.ReliabilityBonus);
         /// <summary>
         /// Percentage - between -1 and 1
         /// </summary>
-        public float TricklebackAndWarSupportProtection => AllBatallions().Average(b => b.TricklebackAndWarSupportProtection);
+        public decimal TricklebackAndWarSupportProtection => AllBatallions().Average(b => b.TricklebackAndWarSupportProtection);
         /// <summary>
         /// Percentage - between -1 and 1
         /// </summary>
-        public float ExperienceLoss => AllBatallions().Average(b => b.ExperienceLoss);
+        public decimal ExperienceLoss => AllBatallions().Average(b => b.ExperienceLoss);
 
-        public float SoftAttack => AllBatallions().Sum(b => b.SoftAttack);
-        public float HardAttack => AllBatallions().Sum(b => b.HardAttack);
-        public float AirAttack => AllBatallions().Sum(b => b.AirAttack);
-        public float Defense => AllBatallions().Sum(b => b.Defense);
-        public float Breakthrough => AllBatallions().Sum(b => b.Breakthrough);
-        public float Armor {
+        public decimal SoftAttack => AllBatallions().Sum(b => b.SoftAttack);
+        public decimal HardAttack => AllBatallions().Sum(b => b.HardAttack);
+        public decimal AirAttack => AllBatallions().Sum(b => b.AirAttack);
+        public decimal Defense => AllBatallions().Sum(b => b.Defense);
+        public decimal Breakthrough => AllBatallions().Sum(b => b.Breakthrough);
+        public decimal Armor {
             get {
                 var maxArmorUnit = AllBatallions().Max(b => b.Armor);
                 var avgArmor = AllBatallions().Average(b => b.Armor);
-                return (maxArmorUnit * 0.4f) + (avgArmor * 0.6f);
+                return (maxArmorUnit * 0.4m) + (avgArmor * 0.6m);
             }
         }
-        public float Piercing
+        public decimal Piercing
         {
             get
             {
                 var maxPiercingUnit = AllBatallions().Max(b => b.Piercing);
                 var avgPiercing = AllBatallions().Average(b => b.Piercing);
-                return (maxPiercingUnit * 0.4f) + (avgPiercing * 0.6f);
+                return Math.Round((maxPiercingUnit * 0.4m) + (avgPiercing * 0.6m), 1, MidpointRounding.ToZero);
             }
         }
 
         // NOTE: Definitely not correct - need to consider engineers which modify leg infantry only.
-        public float Entrenchment => AllBatallions().Sum(b => b.Entrenchment);
+        public decimal Entrenchment => AllBatallions().Sum(b => b.Entrenchment);
         // NOTE: Def wrong - need to consider maint cos and probably not sum.
-        public float EquipmentCaptureRatio => AllBatallions().Sum(b => b.EquipmentCaptureRatio);
-        public float CombatWidth => AllBatallions().Sum(b => b.CombatWidth);
-        public float Manpower => AllBatallions().Sum(b => b.Manpower);
+        public decimal EquipmentCaptureRatio => AllBatallions().Sum(b => b.EquipmentCaptureRatio);
+        public decimal CombatWidth => AllBatallions().Sum(b => b.CombatWidth);
+        public decimal Manpower => AllBatallions().Sum(b => b.Manpower);
         /// <summary>
         /// In Days
         /// </summary>
-        public float TrainingTime => AllBatallions().Max(b => b.TrainingTime);
+        public decimal TrainingTime => AllBatallions().Max(b => b.TrainingTime);
 
-        public float FuelCapacity => AllBatallions().Sum(b => b.FuelCapacity);
-        public float FuelUsage => AllBatallions().Sum(b => b.FuelUsage);
+        public decimal FuelCapacity => AllBatallions().Sum(b => b.FuelCapacity);
+        public decimal FuelUsage => AllBatallions().Sum(b => b.FuelUsage);
 
-        public float InfantryEquipment => AllBatallions().Sum(b => b.InfantryEquipment);
-        public float ProductionCost => AllBatallions().Sum(b => b.ProductionCost);
+        public decimal InfantryEquipment => AllBatallions().Sum(b => b.InfantryEquipment);
+        public decimal Artillery => AllBatallions().Sum(b => b.Artillery);
+        public decimal ProductionCost => AllBatallions().Sum(b => b.ProductionCost);
 
     }
 }
