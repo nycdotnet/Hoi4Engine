@@ -12,5 +12,8 @@
         /// In km
         /// </summary>
         public int Range => Airframe.BaseRange;
+        public decimal SupplyUse => Airframe.SupplyUse;
+        public decimal Weight => Airframe.BaseWeight + Airframe.Modules.Sum(m => m.Weight);
+        public decimal Thrust => Airframe.Thrust;
     }
 }
