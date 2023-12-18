@@ -2,6 +2,7 @@
 {
     public class ArtilleryBatallion : Batallion
     {
+        // SEEMS TO BE IN C:\Program Files (x86)\Steam\steamapps\common\Hearts of Iron IV\common\units\equipment\artillery.txt
         public ArtilleryBatallion()
         {
             MaxSpeed = 4;
@@ -32,7 +33,7 @@
             FuelCapacity = 0;
             FuelUsage = 0;
             Artillery = 36;
-            ProductionCost = 126;
+            ProductionCost = 126; // this is `build_cost_ic` * 
             Kind = BatallionKind.CombatSupport;
         }
     }
