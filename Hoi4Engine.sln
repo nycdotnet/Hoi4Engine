@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AE1B4DE1-00EB-4E79-9639-681FC083300A}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hoi4Extract", "Hoi4Extract\Hoi4Extract.csproj", "{E5042027-2DE4-4626-85A4-85D031046A0B}"

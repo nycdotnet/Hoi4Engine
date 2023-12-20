@@ -13,14 +13,14 @@ namespace Hoi4EngineTests
                     @"Steam\steamapps\common\Hearts of Iron IV",
                     @"common\units\equipment\infantry.txt"), FileMode.Open);
 
-            var equipment = Equipment.Parse(file);
+            var equipment = KnownEquipment.Parse(file);
             equipment.Normalize();
             equipment.InfantryEquipment.Should().HaveCount(5);
 
             var archetype = equipment.InfantryEquipment.Single(eq => eq.Name == "infantry_equipment");
             archetype.IsArchetype.Should().Be(true);
             archetype.Picture.Should().Be("archetype_infantry_equipment");
-            archetype.Type.Should().Be("infantry");
+            archetype.Type.Should().BeEquivalentTo(["infantry"]);
             archetype.GroupBy.Should().Be("archetype");
             archetype.InterfaceCategory.Should().Be("interface_category_land");
             archetype.Active.Should().Be(true);
