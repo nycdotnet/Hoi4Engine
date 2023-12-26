@@ -1,6 +1,8 @@
-﻿namespace Hoi4Engine
+﻿using Hoi4Extract;
+
+namespace Hoi4Engine
 {
-    public class DivisionTemplate
+    public class DivisionTemplate(Hoi4Parser equipment, Technology technology)
     {
         private readonly List<Batallion> brigade1 = new(5);
         private readonly List<Batallion> brigade2 = new(5);
@@ -39,7 +41,7 @@
             AddToBrigade(batallion, brigade5);
         }
 
-        private static void AddToBrigade<TBattalion>(TBattalion batallion, List<TBattalion> brigade) where TBattalion: Batallion
+        private void AddToBrigade<TBattalion>(TBattalion batallion, List<TBattalion> brigade) where TBattalion: Batallion
         {
             if (brigade.Count >= 5)
             {
@@ -49,7 +51,7 @@
             {
                 throw new InvalidOperationException($"This brigade only accepts {brigade[0].Kind} batallions.");
             }
-            
+            batallion.AddEquipment(equipment, technology);
             brigade.Add(batallion);
         }
 
@@ -104,7 +106,6 @@
                 yield return supportCompanies[i];
             }
         }
-
 
         public decimal MaxSpeed => AllBatallions().Min(b => b.MaxSpeed);
 
@@ -214,6 +215,5 @@
         public decimal SupportEquipment => AllBatallionsAndSupportCompanies().Sum(b => b.SupportEquipment);
 
         public decimal ProductionCost => AllBatallionsAndSupportCompanies().Sum(b => b.ProductionCost);
-
     }
 }

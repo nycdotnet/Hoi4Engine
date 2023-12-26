@@ -1,4 +1,6 @@
-﻿namespace Hoi4Engine
+﻿using Hoi4Extract;
+
+namespace Hoi4Engine
 {
     public class AntiAirBatallion : Batallion
     {
@@ -34,6 +36,11 @@
             AntiAir = 30;
             ProductionCost = 120;
             Kind = BatallionKind.CombatSupport;
+        }
+
+        public override void AddEquipment(Hoi4Parser equipment, Technology technology)
+        {
+            throw new NotImplementedException();
         }
     }
 }

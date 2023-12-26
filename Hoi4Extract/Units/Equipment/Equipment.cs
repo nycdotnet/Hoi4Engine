@@ -1,12 +1,8 @@
-﻿namespace Hoi4Extract
+﻿namespace Hoi4Extract.Units.Equipment
 {
-    public abstract class Equipment<T>
+    public abstract class Equipment(string name)
     {
-        public Equipment(string name)
-        {
-            Name = name;
-        }
-        public string Name { get; set; }
+        public string Name { get; set; } = name;
         public bool IsArchetype { get; set; }
         public string? Archetype { get; set; }
         public int? Year { get; set; }
@@ -37,7 +33,7 @@
         public decimal? FuelConsumption { get; set; }
         public IDictionary<string, int>? Resources { get; set; }
 
-        public void Normalize(Equipment<T> archetype)
+        public void Normalize(Equipment archetype)
         {
             if (!Year.HasValue)
             {
@@ -51,10 +47,9 @@
             {
                 IsBuildable = archetype.IsBuildable;
             }
-            if (Type is null)
-            {
-                Type = archetype.Type;
-            }
+            
+            Type ??= archetype.Type;
+
             if (string.IsNullOrEmpty(GroupBy))
             {
                 GroupBy = archetype.GroupBy;
@@ -127,10 +122,8 @@
             {
                 VisualLevel = archetype.VisualLevel;
             }
-            if (Resources is null)
-            {
-                Resources = archetype.Resources;
-            }
+            
+            Resources ??= archetype.Resources;
         }
     }
 }

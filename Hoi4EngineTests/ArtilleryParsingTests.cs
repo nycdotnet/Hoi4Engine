@@ -8,38 +8,57 @@ namespace Hoi4EngineTests
         [Fact]
         public void ParsingArtilleryWorks()
         {
-            using var file = new FileStream(
-                Path.Join(Environment.GetEnvironmentVariable("ProgramFiles(x86)"),
-                    @"Steam\steamapps\common\Hearts of Iron IV",
-                    @"common\units\equipment\artillery.txt"), FileMode.Open);       
+            var parsingContext = new Hoi4ParsingContext();
+            var artilleryEquipment = parsingContext.GetArtilleryEquipment();
 
-            var equipment = KnownEquipment.Parse(file);
-            equipment.Normalize();
-            equipment.InfantryEquipment.Should().BeEmpty();
-            equipment.ArtilleryEquipment.Should().HaveCount(9);
+            artilleryEquipment.Should().HaveCount(9);
 
-            { 
-                var artiArchetype = equipment.ArtilleryEquipment.Single(eq => eq.Name == "artillery_equipment");
-                artiArchetype.IsArchetype.Should().Be(true);
-                artiArchetype.Picture.Should().Be("archetype_artillery_equipment");
-                artiArchetype.Type.Should().BeEquivalentTo(["artillery", "infantry"]);
-                artiArchetype.GroupBy.Should().Be("archetype");
-                artiArchetype.InterfaceCategory.Should().Be("interface_category_land");
-                artiArchetype.Reliability.Should().Be(0.8m);
-                artiArchetype.Defense.Should().Be(10);
-                artiArchetype.Breakthrough.Should().Be(6);
-                artiArchetype.Hardness.Should().Be(0);
-                artiArchetype.ArmorValue.Should().Be(0);
-                artiArchetype.SoftAttack.Should().Be(25);
-                artiArchetype.HardAttack.Should().Be(2);
-                artiArchetype.Piercing.Should().Be(5);
-                artiArchetype.AirAttack.Should().Be(0);
-                artiArchetype.LendLeaseCost.Should().Be(4);
-                artiArchetype.BuildCostIC.Should().Be(3.5m);
-                artiArchetype.Resources.Should().BeEquivalentTo(new Dictionary<string, int> {
+            {
+                var archetype = artilleryEquipment.Single(eq => eq.Name == "artillery_equipment");
+                archetype.IsArchetype.Should().BeTrue();
+                archetype.Picture.Should().Be("archetype_artillery_equipment");
+                archetype.Type.Should().BeEquivalentTo(["artillery", "infantry"]);
+                archetype.GroupBy.Should().Be("archetype");
+                archetype.InterfaceCategory.Should().Be("interface_category_land");
+                archetype.Reliability.Should().Be(0.8m);
+                archetype.Defense.Should().Be(10);
+                archetype.Breakthrough.Should().Be(6);
+                archetype.Hardness.Should().Be(0);
+                archetype.ArmorValue.Should().Be(0);
+                archetype.SoftAttack.Should().Be(25);
+                archetype.HardAttack.Should().Be(2);
+                archetype.Piercing.Should().Be(5);
+                archetype.AirAttack.Should().Be(0);
+                archetype.LendLeaseCost.Should().Be(4);
+                archetype.BuildCostIC.Should().Be(3.5m);
+                archetype.Resources.Should().BeEquivalentTo(new Dictionary<string, int> {
                     { "steel", 2 },
                     { "tungsten", 1 }
                 });
+            }
+
+            {
+                var aeII = artilleryEquipment.Single(eq => eq.Name == "artillery_equipment_2");
+                aeII.IsArchetype.Should().BeFalse();
+                aeII.Defense.Should().Be(15);
+                aeII.Breakthrough.Should().Be(7);
+                aeII.SoftAttack.Should().Be(30);
+            }
+
+            {
+                var aeIII = artilleryEquipment.Single(eq => eq.Name == "artillery_equipment_3");
+                aeIII.IsArchetype.Should().BeFalse();
+                aeIII.Defense.Should().Be(18);
+                aeIII.Breakthrough.Should().Be(8);
+                aeIII.SoftAttack.Should().Be(34);
+            }
+
+            {
+                var rocketI = artilleryEquipment.Single(eq => eq.Name == "rocket_artillery_equipment_1");
+                rocketI.IsArchetype.Should().BeFalse();
+                rocketI.Defense.Should().Be(12);
+                rocketI.Breakthrough.Should().Be(9);
+                rocketI.SoftAttack.Should().Be(30);
             }
         }
     }

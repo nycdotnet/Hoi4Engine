@@ -8,16 +8,12 @@ namespace Hoi4EngineTests
         [Fact]
         public void ParsingInfantryEquipmentWorks()
         {
-            using var file = new FileStream(
-                Path.Join(Environment.GetEnvironmentVariable("ProgramFiles(x86)"),
-                    @"Steam\steamapps\common\Hearts of Iron IV",
-                    @"common\units\equipment\infantry.txt"), FileMode.Open);
+            var parsingContext = new Hoi4ParsingContext();
+            var infantryEquipment = parsingContext.GetInfantryEquipment();
 
-            var equipment = KnownEquipment.Parse(file);
-            equipment.Normalize();
-            equipment.InfantryEquipment.Should().HaveCount(5);
+            infantryEquipment.Should().HaveCount(5);
 
-            var archetype = equipment.InfantryEquipment.Single(eq => eq.Name == "infantry_equipment");
+            var archetype = infantryEquipment.Single(eq => eq.Name == "infantry_equipment");
             archetype.IsArchetype.Should().Be(true);
             archetype.Picture.Should().Be("archetype_infantry_equipment");
             archetype.Type.Should().BeEquivalentTo(["infantry"]);
@@ -42,7 +38,7 @@ namespace Hoi4EngineTests
 
             {
                 // Basic Infantry Equipment
-                var basic = equipment.InfantryEquipment.Single(eq => eq.Name == "infantry_equipment_0");
+                var basic = infantryEquipment.Single(eq => eq.Name == "infantry_equipment_0");
                 basic.Defense.Should().Be(20); // copied from archetype
                 basic.ArmorValue.Should().Be(0); // copied from archetype
                 basic.Year.Should().Be(1918);
@@ -50,7 +46,7 @@ namespace Hoi4EngineTests
 
             {
                 // Infantry Equipment I
-                var infantryEquipI = equipment.InfantryEquipment.Single(eq => eq.Name == "infantry_equipment_1");
+                var infantryEquipI = infantryEquipment.Single(eq => eq.Name == "infantry_equipment_1");
                 infantryEquipI.Year.Should().Be(1936);
                 infantryEquipI.Priority.Should().Be(10);
                 infantryEquipI.VisualLevel.Should().Be(1);
@@ -69,7 +65,7 @@ namespace Hoi4EngineTests
 
             {
                 // Infantry Equipment II
-                var infantryEquipII = equipment.InfantryEquipment.Single(eq => eq.Name == "infantry_equipment_2");
+                var infantryEquipII = infantryEquipment.Single(eq => eq.Name == "infantry_equipment_2");
                 infantryEquipII.Year.Should().Be(1939);
                 infantryEquipII.Priority.Should().Be(10);
                 infantryEquipII.VisualLevel.Should().Be(2);
@@ -89,7 +85,7 @@ namespace Hoi4EngineTests
 
             {
                 // Infantry Equipment III
-                var infantryEquipIII = equipment.InfantryEquipment.Single(eq => eq.Name == "infantry_equipment_3");
+                var infantryEquipIII = infantryEquipment.Single(eq => eq.Name == "infantry_equipment_3");
                 infantryEquipIII.Year.Should().Be(1942);
                 infantryEquipIII.Priority.Should().Be(10);
                 infantryEquipIII.VisualLevel.Should().Be(3);

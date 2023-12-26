@@ -1,4 +1,6 @@
-﻿namespace Hoi4Engine
+﻿using Hoi4Extract;
+
+namespace Hoi4Engine
 {
     public class ArtilleryBatallion : Batallion
     {
@@ -35,6 +37,11 @@
             Artillery = 36;
             ProductionCost = 126; // this is `build_cost_ic` * 
             Kind = BatallionKind.CombatSupport;
+        }
+
+        public override void AddEquipment(Hoi4Parser equipment, Technology technology)
+        {
+            throw new NotImplementedException();
         }
     }
 }

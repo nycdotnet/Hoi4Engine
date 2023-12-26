@@ -1,19 +1,12 @@
 ﻿using Pdoxcl2Sharp;
 
-namespace Hoi4Extract
+namespace Hoi4Extract.Units.Equipment
 {
-    //C:\Program Files(x86)\Steam\steamapps\common\Hearts of Iron IV\
-    // The file common\units\equipment\infantry.txt
-    // contains stats on infantry equipment.
-    public class InfantryEquipment : Equipment<InfantryEquipment>, IParadoxRead
+    public class ArtilleryEquipment(string name) : Equipment(name), IParadoxRead
     {
-        public InfantryEquipment(string name) : base(name)
-        {
-        }
-
         public void TokenCallback(ParadoxParser parser, string token)
         {
-            switch(token)
+            switch (token)
             {
                 case "year": Year = parser.ReadInt32(); break;
                 case "is_archetype": IsArchetype = parser.ReadBool(); break;
@@ -21,11 +14,7 @@ namespace Hoi4Extract
                 case "picture": Picture = parser.ReadString(); break;
                 case "is_buildable": IsBuildable = parser.ReadBool(); break;
                 case "type":
-                    if (Type is null)
-                    {
-                        Type = [];
-                    }
-                    Type.Add(parser.ReadString());
+                    Type = parser.ReadStringList();
                     break;
                 case "group_by": GroupBy = parser.ReadString(); break;
                 case "interface_category": InterfaceCategory = parser.ReadString(); break;
@@ -42,10 +31,13 @@ namespace Hoi4Extract
                 case "air_attack": AirAttack = (decimal)parser.ReadDouble(); break;
                 case "lend_lease_cost": LendLeaseCost = (decimal)parser.ReadDouble(); break;
                 case "build_cost_ic": BuildCostIC = (decimal)parser.ReadDouble(); break;
-                case "resources": Resources = parser.ReadDictionary(x => x.ReadString(), x => x.ReadInt32()) ; break;
+                case "resources": Resources = parser.ReadDictionary(x => x.ReadString(), x => x.ReadInt32()); break;
                 case "parent": Parent = parser.ReadString(); break;
                 case "priority": Priority = parser.ReadInt32(); break;
                 case "visual_level": VisualLevel = parser.ReadInt32(); break;
+                case "fuel_consumption": FuelConsumption = (decimal)parser.ReadDouble(); break;
+                default:
+                    throw new NotSupportedException($"The token {token} is not supported!");
             }
         }
     }

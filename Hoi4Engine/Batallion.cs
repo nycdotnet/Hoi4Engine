@@ -1,6 +1,8 @@
-﻿namespace Hoi4Engine
+﻿using Hoi4Extract;
+
+namespace Hoi4Engine
 {
-    public class Batallion
+    public abstract class Batallion
     {
         // *************** BASE STATS *************** 
 
@@ -76,5 +78,7 @@
 
         public BatallionKind Kind { get; protected set; }
         public bool IsLegInfantry { get; protected set; }
+
+        public abstract void AddEquipment(Hoi4Parser equipment, Technology technology);
     }
 }

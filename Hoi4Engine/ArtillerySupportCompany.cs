@@ -1,4 +1,6 @@
-﻿namespace Hoi4Engine
+﻿using Hoi4Extract;
+
+namespace Hoi4Engine
 {
     public class ArtillerySupportCompany : SupportCompany
     {
@@ -24,6 +26,11 @@
             SupportEquipment = 30;
             ProductionCost = 42;
             RecoveryRate = 0.1m;
+        }
+
+        public override void AddEquipment(Hoi4Parser equipment, Technology technology)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,13 +1,12 @@
 ﻿using Pdoxcl2Sharp;
 
-namespace Hoi4Extract
+namespace Hoi4Extract.Units.Equipment
 {
-    public class ArtilleryEquipment : Equipment<ArtilleryEquipment>, IParadoxRead
+    //C:\Program Files(x86)\Steam\steamapps\common\Hearts of Iron IV\
+    // The file common\units\equipment\infantry.txt
+    // contains stats on infantry equipment.
+    public class InfantryEquipment(string name) : Equipment(name), IParadoxRead
     {
-        public ArtilleryEquipment(string name) : base(name)
-        {
-        }
-
         public void TokenCallback(ParadoxParser parser, string token)
         {
             switch (token)
@@ -18,7 +17,8 @@ namespace Hoi4Extract
                 case "picture": Picture = parser.ReadString(); break;
                 case "is_buildable": IsBuildable = parser.ReadBool(); break;
                 case "type":
-                    Type = parser.ReadStringList();
+                    Type ??= [];
+                    Type.Add(parser.ReadString());
                     break;
                 case "group_by": GroupBy = parser.ReadString(); break;
                 case "interface_category": InterfaceCategory = parser.ReadString(); break;
@@ -39,9 +39,6 @@ namespace Hoi4Extract
                 case "parent": Parent = parser.ReadString(); break;
                 case "priority": Priority = parser.ReadInt32(); break;
                 case "visual_level": VisualLevel = parser.ReadInt32(); break;
-                case "fuel_consumption": FuelConsumption = (decimal)parser.ReadDouble(); break;
-                default:
-                    throw new NotSupportedException($"The token {token} is not supported!");
             }
         }
     }
