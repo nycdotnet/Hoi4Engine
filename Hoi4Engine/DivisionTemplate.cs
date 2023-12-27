@@ -201,7 +201,7 @@ namespace Hoi4Engine
         /// <summary>
         /// The amount of Infantry equipment required by this division
         /// </summary>
-        public decimal InfantryEquipment => AllBatallionsAndSupportCompanies().Sum(b => b.InfantryEquipment);
+        public decimal InfantryEquipment => AllBatallionsAndSupportCompanies().Sum(b => b.InfantryEquipmentCount);
         /// <summary>
         /// The amount of Artillery equipment required by this division
         /// </summary>

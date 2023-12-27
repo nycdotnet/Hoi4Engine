@@ -25,7 +25,7 @@ namespace Hoi4EngineTests
 
             var template = new DivisionTemplate();
             var bat = new ParsedBattalion(infantryBatallion);
-            bat.AddFullEquipment(basicInfEq);
+            bat.SetFullEquipment(basicInfEq);
 
             template.AddToBrigade1(bat);
             template.SoftAttack.Should().Be(3);
@@ -39,7 +39,7 @@ namespace Hoi4EngineTests
             var infantryBatallion = parsingContext.GetInfantryBatallions().Single(x => x.Name == "infantry");
 
             var bat = new ParsedBattalion(infantryBatallion);
-            bat.AddFullEquipment(basicInfEq);
+            bat.SetFullEquipment(basicInfEq);
 
             var template = new DivisionTemplate();
             template.AddToBrigade1(bat);
@@ -55,11 +55,41 @@ namespace Hoi4EngineTests
             var infantryBatallion = parsingContext.GetInfantryBatallions().Single(x => x.Name == "infantry");
 
             var bat = new ParsedBattalion(infantryBatallion);
-            bat.AddFullEquipment(advancedInfEq);
+            bat.SetFullEquipment(advancedInfEq);
 
             var template = new DivisionTemplate();
             template.AddToBrigade1(bat);
             template.SoftAttack.Should().Be(12);
+        }
+
+        [Fact]
+        public void SingleInfantryBattalionWithVariedInfantryEquipmentHasExpectedStats()
+        {
+            var parsingContext = new Hoi4ParsingContext();
+            var basicInfEq = parsingContext.GetInfantryEquipment().Single(x => x.Name == "infantry_equipment_0");
+            var advancedInfEq = parsingContext.GetInfantryEquipment().Single(x => x.Name == "infantry_equipment_3");
+            var infantryBatallion = parsingContext.GetInfantryBatallions().Single(x => x.Name == "infantry");
+
+            var bat = new ParsedBattalion(infantryBatallion);
+            bat.AddEquipment(basicInfEq, 30);
+            bat.AddEquipment(advancedInfEq, 60);
+            bat.InfantryEquipmentCount.Should().Be(90);
+
+            var batallionEquipment = bat.GetEquipment().ToArray();
+            batallionEquipment.Should().HaveCount(1);
+            batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory.Should().HaveCount(2);
+            batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory
+                .Single(i => i.Equipment.Name == "infantry_equipment_0").Equipment.SoftAttack.Should().Be(3);
+            batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory
+                .Single(i => i.Equipment.Name == "infantry_equipment_0").Quantity.Should().Be(30);
+            batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory
+                .Single(i => i.Equipment.Name == "infantry_equipment_3").Equipment.SoftAttack.Should().Be(12);
+            batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory
+                .Single(i => i.Equipment.Name == "infantry_equipment_3").Quantity.Should().Be(60);
+
+            var template = new DivisionTemplate();
+            template.AddToBrigade1(bat);
+            template.SoftAttack.Should().Be(8.1m);  // (3 * 30 / 100) -> 0.9 + (12 * 60 /100) -> 7.2 -> 8.1
         }
 
 

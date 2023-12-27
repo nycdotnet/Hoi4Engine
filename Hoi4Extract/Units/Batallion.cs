@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hoi4Extract.Units
+﻿namespace Hoi4Extract.Units
 {
     public abstract class Batallion
     {
@@ -40,7 +34,7 @@ namespace Hoi4Extract.Units
 
         // *************** COMBAT STATS *************** 
 
-        public virtual decimal SoftAttack { get; protected set; }
+        public abstract decimal SoftAttack { get; }
         public decimal HardAttack { get; protected set; }
         public decimal AirAttack { get; protected set; }
         public decimal Defense { get; protected set; }
@@ -74,7 +68,7 @@ namespace Hoi4Extract.Units
         /// </summary>
         public decimal ProductionCost { get; protected set; }
 
-        public decimal InfantryEquipment { get; protected set; }
+        public abstract int InfantryEquipmentCount { get; }
         public decimal Artillery { get; protected set; }
         public decimal AntiAir { get; protected set; }
         public decimal SupportEquipment { get; protected set; }
