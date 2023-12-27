@@ -31,7 +31,7 @@ namespace Hoi4EngineTests
                 ib.CombatWidth.Should().Be(2);
                 ib.MaxStrength.Should().Be(25);
                 ib.MaxOrganization.Should().Be(60);
-                ib.DefaultMorale.Should().Be(0.3m);
+                ib.RecoveryRate.Should().Be(0.3m);
                 ib.Manpower.Should().Be(1000);
                 ib.TrainingTime.Should().Be(90);
                 ib.Suppression.Should().Be(1.5m);

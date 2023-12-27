@@ -2,6 +2,9 @@
 
 namespace Hoi4Extract.Units
 {
+    /// <summary>
+    /// Represents a parsed batallion template
+    /// </summary>
     public class InfantryBattalion(string name) : IParadoxRead
     {
         public string Name => name;
@@ -19,7 +22,10 @@ namespace Hoi4Extract.Units
         public List<string> EssentialEquipment { get; private set; } = [];
         public string Group { get; private set; } = "";
         public List<string> Categories { get; private set; } = [];
-        public decimal DefaultMorale { get; private set; }
+        /// <summary>
+        /// Note: This is called Morale in the game files
+        /// </summary>
+        public decimal RecoveryRate { get; private set; }
         public int MaxOrganization { get; private set; }
         public int MaxStrength { get; private set; }
         public int CombatWidth { get; private set; }
@@ -39,17 +45,17 @@ namespace Hoi4Extract.Units
         public IDictionary<string, decimal> Urban { get; private set; }
         public IDictionary<string, decimal> Desert { get; private set; }
         public IDictionary<string, decimal> River { get; private set; }
+        public IDictionary<string, decimal> Jungle { get; private set; }
         public bool SpecialForces { get; private set; }
         public bool Marines { get; private set; }
+        public bool Mountaineers { get; private set; }
         public decimal Breakthrough { get; private set; }
         public bool CanExfiltrateFromCoast { get; private set; }
-        public bool Mountaineers { get; private set; }
         public bool CanBeParachuted { get; private set; }
         /// <summary>
         /// This is what moves us and sets speed
         /// </summary>
-        public string Transport { get; private set; }
-        public IDictionary<string, decimal> Jungle { get; private set; }
+        public string Transport { get; private set; } = "";
         public decimal SoftAttack { get; private set; }
         public decimal HardAttack { get; private set; }
         public decimal Defense { get; private set; }
@@ -77,7 +83,7 @@ namespace Hoi4Extract.Units
                 case "max_strength": MaxStrength = parser.ReadInt32(); break;
                 case "max_organisation": MaxOrganization = parser.ReadInt32(); break;
                 case "maximum_speed": MaxSpeed = (decimal)parser.ReadDouble(); break;
-                case "default_morale": DefaultMorale = (decimal)parser.ReadDouble(); break;
+                case "default_morale": RecoveryRate = (decimal)parser.ReadDouble(); break;
                 case "manpower": Manpower = parser.ReadInt32(); break;
                 case "training_time": TrainingTime = parser.ReadInt32(); break;
                 case "suppression": Suppression = (decimal)parser.ReadDouble(); break;

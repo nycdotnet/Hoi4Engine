@@ -5,17 +5,65 @@ using Hoi4Extract;
 namespace Hoi4EngineTests
 {
 
-    public class DivisionTemplateTests
-    {
-        [Fact(Skip = "Uncomment these tests when ready.")]
-        public void ToDoUncomment()
-        {
-
-        }
-    }
-
     //public class DivisionTemplateTests
     //{
+    //    [Fact(Skip = "Uncomment these tests when ready.")]
+    //    public void ToDoUncomment()
+    //    {
+
+    //    }
+    //}
+
+    public class DivisionTemplateTests
+    {
+        [Fact]
+        public void SingleInfantryBatallionWithBasicEquipmentHasExpectedStats()
+        {
+            var parsingContext = new Hoi4ParsingContext();
+            var basicInfEq = parsingContext.GetInfantryEquipment().Single(x => x.Name == "infantry_equipment_0");
+            var infantryBatallion = parsingContext.GetInfantryBatallions().Single(x => x.Name == "infantry");
+
+            var template = new DivisionTemplate();
+            var bat = new ParsedBattalion(infantryBatallion);
+            bat.AddFullEquipment(basicInfEq);
+
+            template.AddToBrigade1(bat);
+            template.SoftAttack.Should().Be(3);
+        }
+
+        [Fact]
+        public void TwoInfantryBatallionsWithBasicEquipmentHaveExpectedStats()
+        {
+            var parsingContext = new Hoi4ParsingContext();
+            var basicInfEq = parsingContext.GetInfantryEquipment().Single(x => x.Name == "infantry_equipment_0");
+            var infantryBatallion = parsingContext.GetInfantryBatallions().Single(x => x.Name == "infantry");
+
+            var bat = new ParsedBattalion(infantryBatallion);
+            bat.AddFullEquipment(basicInfEq);
+
+            var template = new DivisionTemplate();
+            template.AddToBrigade1(bat);
+            template.AddToBrigade1(bat);
+            template.SoftAttack.Should().Be(6);
+        }
+
+        [Fact]
+        public void SingleInfantryBatallionWithInfEquipmentIIIHasExpectedStats()
+        {
+            var parsingContext = new Hoi4ParsingContext();
+            var advancedInfEq = parsingContext.GetInfantryEquipment().Single(x => x.Name == "infantry_equipment_3");
+            var infantryBatallion = parsingContext.GetInfantryBatallions().Single(x => x.Name == "infantry");
+
+            var bat = new ParsedBattalion(infantryBatallion);
+            bat.AddFullEquipment(advancedInfEq);
+
+            var template = new DivisionTemplate();
+            template.AddToBrigade1(bat);
+            template.SoftAttack.Should().Be(12);
+        }
+
+
+    }
     //    public void SingleInfantryBatallionHasExpectedStats()
     //    {
     //        using var artiFile = new FileStream(

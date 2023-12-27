@@ -1,8 +1,9 @@
 ﻿using Hoi4Extract;
+using Hoi4Extract.Units;
 
 namespace Hoi4Engine
 {
-    public class DivisionTemplate(Hoi4Parser equipment, Technology technology)
+    public class DivisionTemplate()
     {
         private readonly List<Batallion> brigade1 = new(5);
         private readonly List<Batallion> brigade2 = new(5);
@@ -13,12 +14,12 @@ namespace Hoi4Engine
 
         public void AddSupportCompany(SupportCompany batallion)
         {
-            var type = batallion.GetType();
-            if (supportCompanies.Any(sc => sc.GetType() == type))
-            {
-                throw new InvalidOperationException($"This division already has a(n) {type.Name}.");
-            }
-            AddToBrigade(batallion, supportCompanies);
+            //var type = batallion.GetType();
+            //if (supportCompanies.Any(sc => sc.GetType() == type))
+            //{
+            //    throw new InvalidOperationException($"This division already has a(n) {type.Name}.");
+            //}
+            //AddToBrigade(batallion, supportCompanies);
         }
         public void AddToBrigade1(Batallion batallion)
         {
@@ -51,7 +52,7 @@ namespace Hoi4Engine
             {
                 throw new InvalidOperationException($"This brigade only accepts {brigade[0].Kind} batallions.");
             }
-            batallion.AddEquipment(equipment, technology);
+            //batallion.AddEquipment(equipment, technology);
             brigade.Add(batallion);
         }
 
@@ -103,7 +104,7 @@ namespace Hoi4Engine
             }
             for (var i = 0; i < supportCompanies.Count; i++)
             {
-                yield return supportCompanies[i];
+                //yield return supportCompanies[i];
             }
         }
 
@@ -176,11 +177,11 @@ namespace Hoi4Engine
             get
             {
                 var legInfantryBonus = 0m;
-                var engCo = supportCompanies.FirstOrDefault(c => c is EngineerSupportCompany);
-                if (engCo is not null)
-                {
-                    legInfantryBonus += 0.2m;
-                }
+                //var engCo = supportCompanies.FirstOrDefault(c => c is EngineerSupportCompany);
+                //if (engCo is not null)
+                //{
+                //    legInfantryBonus += 0.2m;
+                //}
                 return AllBatallionsAndSupportCompanies()
                     .Sum(b => b is { IsLegInfantry: true } ? b.Entrenchment + legInfantryBonus : b.Entrenchment);
             }

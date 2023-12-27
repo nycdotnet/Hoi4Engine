@@ -4,7 +4,7 @@ using Pdoxcl2Sharp;
 
 namespace Hoi4Extract
 {
-    public partial class Hoi4Parser //: IParadoxRead
+    public class Hoi4Parser //: IParadoxRead
     {
         public List<InfantryEquipment> InfantryEquipment = [];
         public List<ArtilleryEquipment> ArtilleryEquipment = [];

@@ -4,10 +4,10 @@
     {
         public string Name { get; set; } = name;
         public bool IsArchetype { get; set; }
-        public string? Archetype { get; set; }
+        public string Archetype { get; set; } = "";
         public int? Year { get; set; }
-        public string? Picture { get; set; }
-        public string? Parent { get; set; }
+        public string Picture { get; set; } = "";
+        public string Parent { get; set; } = "";
         public int? Priority { get; set; }
         public int? VisualLevel { get; set; }
         public bool? IsBuildable { get; set; }
