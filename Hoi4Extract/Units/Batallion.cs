@@ -7,18 +7,18 @@
         /// <summary>
         /// In Km/hr
         /// </summary>
-        public decimal MaxSpeed { get; protected set; }
-        public decimal HP { get; protected set; }
-        public decimal Organization { get; protected set; }
-        public decimal RecoveryRate { get; protected set; }
+        public abstract decimal MaxSpeed { get; }
+        public abstract decimal HP { get; }
+        public abstract decimal Organization { get; }
+        public abstract decimal RecoveryRate { get; }
         public decimal Reconnaisance { get; protected set; }
-        public decimal Suppression { get; protected set; }
-        public decimal Weight { get; protected set; }
-        public decimal SupplyUse { get; protected set; }
+        public abstract decimal Suppression { get; }
+        public abstract decimal Weight { get; }
+        public abstract decimal SupplyUse { get; }
         /// <summary>
         /// Percentage - between 0 and 1
         /// </summary>
-        public decimal AverageReliability { get; protected set; }
+        public abstract decimal AverageReliability { get; }
         /// <summary>
         /// Percentage - between 0 and 1
         /// </summary>
@@ -35,12 +35,12 @@
         // *************** COMBAT STATS *************** 
 
         public abstract decimal SoftAttack { get; }
-        public decimal HardAttack { get; protected set; }
+        public abstract decimal HardAttack { get; }
         public decimal AirAttack { get; protected set; }
-        public decimal Defense { get; protected set; }
-        public decimal Breakthrough { get; protected set; }
-        public decimal Armor { get; protected set; }
-        public decimal Piercing { get; protected set; }
+        public abstract decimal Defense { get; }
+        public abstract decimal Breakthrough { get; }
+        public abstract decimal Armor { get; }
+        public abstract decimal Piercing { get; }
         /// <summary>
         /// Percentage - between 0 and 1
         /// </summary>
@@ -50,23 +50,23 @@
         /// Percentage - between 0 and 1
         /// </summary>
         public decimal EquipmentCaptureRatio { get; protected set; }
-        public decimal CombatWidth { get; protected set; }
+        public abstract decimal CombatWidth { get; }
 
 
         // *************** EQUIPMENT COST *************** 
 
-        public decimal Manpower { get; protected set; }
+        public abstract decimal Manpower { get; }
         /// <summary>
         /// In Days
         /// </summary>
-        public decimal TrainingTime { get; protected set; }
+        public abstract decimal TrainingTime { get; }
         public decimal FuelCapacity { get; protected set; }
         public decimal FuelUsage { get; protected set; }
 
         /// <summary>
         /// In IC
         /// </summary>
-        public decimal ProductionCost { get; protected set; }
+        public abstract decimal ProductionCost { get; }
 
         public abstract int InfantryEquipmentCount { get; }
         public decimal Artillery { get; protected set; }

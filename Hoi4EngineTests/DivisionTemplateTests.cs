@@ -4,16 +4,6 @@ using Hoi4Extract;
 
 namespace Hoi4EngineTests
 {
-
-    //public class DivisionTemplateTests
-    //{
-    //    [Fact(Skip = "Uncomment these tests when ready.")]
-    //    public void ToDoUncomment()
-    //    {
-
-    //    }
-    //}
-
     public class DivisionTemplateTests
     {
         [Fact]
@@ -90,109 +80,137 @@ namespace Hoi4EngineTests
             var template = new DivisionTemplate();
             template.AddToBrigade1(bat);
             template.SoftAttack.Should().Be(8.1m);  // (3 * 30 / 100) -> 0.9 + (12 * 60 /100) -> 7.2 -> 8.1
+            template.AverageReliability.Should().Be(0.833m); // ( 30 * .9 ) + (60 * .8)  = (27 + 48) / 90  =  75/90 => 0.833
+        }
+
+        [Fact]
+        public void WhenThereAreZeroOfAnEquipmentKindItIsIgnoredForReliability()
+        {
+            var parsingContext = new Hoi4ParsingContext();
+            var basicInfEq = parsingContext.GetInfantryEquipment().Single(x => x.Name == "infantry_equipment_0");
+            var advancedInfEq = parsingContext.GetInfantryEquipment().Single(x => x.Name == "infantry_equipment_3");
+            var infantryBatallion = parsingContext.GetInfantryBatallions().Single(x => x.Name == "infantry");
+
+            var bat = new ParsedBattalion(infantryBatallion);
+            bat.AddEquipment(basicInfEq, 0);
+            bat.AddEquipment(advancedInfEq, 0);
+            bat.InfantryEquipmentCount.Should().Be(0);
+
+            var batallionEquipment = bat.GetEquipment().ToArray();
+            batallionEquipment.Should().HaveCount(1);
+            batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory.Should().HaveCount(2);
+            batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory
+                .Single(i => i.Equipment.Name == "infantry_equipment_0").Equipment.Reliability.Should().Be(0.9m);
+            batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory
+                .Single(i => i.Equipment.Name == "infantry_equipment_0").Quantity.Should().Be(0);
+            batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory
+                .Single(i => i.Equipment.Name == "infantry_equipment_3").Equipment.Reliability.Should().Be(0.8m);
+            batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory
+                .Single(i => i.Equipment.Name == "infantry_equipment_3").Quantity.Should().Be(0);
+
+            var template = new DivisionTemplate();
+            template.AddToBrigade1(bat);
+            template.AverageReliability.Should().Be(1m);
+        }
+
+        [Fact]
+        public void SingleInfantryBatallionWithInfantryEquipmentIHasExpectedStats()
+        {
+            var parsingContext = new Hoi4ParsingContext();
+            var infEquipI = parsingContext.GetInfantryEquipment().Single(x => x.Name == "infantry_equipment_1");
+            var infantryBatallion = parsingContext.GetInfantryBatallions().Single(x => x.Name == "infantry");
+
+            var template = new DivisionTemplate();
+            var bat = new ParsedBattalion(infantryBatallion);
+            bat.SetFullEquipment(infEquipI);
+
+            template.AddToBrigade1(bat);
+
+            template.MaxSpeed.Should().Be(4);
+            template.HP.Should().Be(25);
+            template.Organization.Should().Be(60);
+            template.RecoveryRate.Should().Be(0.3m);
+            template.Reconnaisance.Should().Be(0);
+            template.Suppression.Should().Be(1.5m);
+            template.Weight.Should().Be(0.5m);
+            template.SupplyUse.Should().Be(0.06m);
+            template.AverageReliability.Should().Be(0.9m);
+            template.ReliabilityBonus.Should().Be(0);
+            template.TricklebackAndWarSupportProtection.Should().Be(0);
+            template.ExperienceLoss.Should().Be(0);
+
+            template.SoftAttack.Should().Be(6);
+            template.HardAttack.Should().Be(1);
+            template.AirAttack.Should().Be(0);
+            template.Defense.Should().Be(22);
+            template.Breakthrough.Should().Be(3);
+            template.Armor.Should().Be(0);
+            template.Piercing.Should().Be(4);
+            template.Initiative.Should().Be(0);
+            template.Entrenchment.Should().Be(0);
+            template.EquipmentCaptureRatio.Should().Be(0);
+            template.Manpower.Should().Be(1000);
+            template.TrainingTime.Should().Be(90);
+            template.FuelUsage.Should().Be(0);
+            template.FuelCapacity.Should().Be(0);
+            template.InfantryEquipment.Should().Be(100);
+            template.ProductionCost.Should().Be(50);
+            template.CombatWidth.Should().Be(2);
+        }
+
+        [Fact]
+        public void TwoInfantryBatallionHasExpectedStats()
+        {
+            var parsingContext = new Hoi4ParsingContext();
+            var infEquipI = parsingContext.GetInfantryEquipment().Single(x => x.Name == "infantry_equipment_1");
+            var infantryBatallion = parsingContext.GetInfantryBatallions().Single(x => x.Name == "infantry");
+
+            var bat = new ParsedBattalion(infantryBatallion);
+            bat.SetFullEquipment(infEquipI);
+
+            var template = new DivisionTemplate();
+            template.AddToBrigade1(bat);
+            template.AddToBrigade1(bat);
+
+            template.MaxSpeed.Should().Be(4);
+            template.HP.Should().Be(50);
+            template.Organization.Should().Be(60);
+            template.RecoveryRate.Should().Be(0.3m);
+            template.Reconnaisance.Should().Be(0);
+            template.Suppression.Should().Be(3);
+            template.Weight.Should().Be(1);
+            template.SupplyUse.Should().Be(0.12m);
+            template.AverageReliability.Should().Be(0.9m);
+            template.ReliabilityBonus.Should().Be(0);
+            template.TricklebackAndWarSupportProtection.Should().Be(0);
+            template.ExperienceLoss.Should().Be(0);
+
+            template.SoftAttack.Should().Be(12);
+            template.HardAttack.Should().Be(2);
+            template.AirAttack.Should().Be(0);
+            template.Defense.Should().Be(44);
+            template.Breakthrough.Should().Be(6);
+            template.Armor.Should().Be(0);
+            template.Piercing.Should().Be(4);
+            template.Initiative.Should().Be(0);
+            template.Entrenchment.Should().Be(0);
+            template.EquipmentCaptureRatio.Should().Be(0);
+
+            template.Manpower.Should().Be(2000);
+            template.TrainingTime.Should().Be(90);
+            template.FuelUsage.Should().Be(0);
+            template.FuelCapacity.Should().Be(0);
+            template.InfantryEquipment.Should().Be(200);
+            template.ProductionCost.Should().Be(100);
+            template.CombatWidth.Should().Be(4);
         }
 
 
     }
-    //    public void SingleInfantryBatallionHasExpectedStats()
-    //    {
-    //        using var artiFile = new FileStream(
-    //                        Path.Join(Environment.GetEnvironmentVariable("ProgramFiles(x86)"),
-    //                            @"Steam\steamapps\common\Hearts of Iron IV",
-    //                            @"common\units\equipment\artillery.txt"), FileMode.Open, FileAccess.Read);
-
-    //        using var infEquipFile = new FileStream(
-    //            Path.Join(Environment.GetEnvironmentVariable("ProgramFiles(x86)"),
-    //                @"Steam\steamapps\common\Hearts of Iron IV",
-    //                @"common\units\equipment\infantry.txt"), FileMode.Open, FileAccess.Read);
-
-    //        var equipment = KnownEquipment.Parse(artiFile);
-    //        equipment = KnownEquipment.Parse(infEquipFile, equipment);
 
 
-    //        var template = new DivisionTemplate(equipment, null);
-    //        template.AddToBrigade1(new InfantryBatallion());
 
-    //        template.MaxSpeed.Should().Be(4);
-    //        template.HP.Should().Be(25);
-    //        template.Organization.Should().Be(60);
-    //        template.RecoveryRate.Should().Be(0.3m);
-    //        template.Reconnaisance.Should().Be(0);
-    //        template.Suppression.Should().Be(1.5m);
-    //        template.Weight.Should().Be(0.5m);
-    //        template.SupplyUse.Should().Be(0.06m);
-    //        template.AverageReliability.Should().Be(0.9m);
-    //        template.ReliabilityBonus.Should().Be(0);
-    //        template.TricklebackAndWarSupportProtection.Should().Be(0);
-    //        template.ExperienceLoss.Should().Be(0);
 
-    //        template.SoftAttack.Should().Be(6);
-    //        template.HardAttack.Should().Be(1);
-    //        template.AirAttack.Should().Be(0);
-    //        template.Defense.Should().Be(22);
-    //        template.Breakthrough.Should().Be(3);
-    //        template.Armor.Should().Be(0);
-    //        template.Piercing.Should().Be(4);
-    //        template.Initiative.Should().Be(0);
-    //        template.Entrenchment.Should().Be(0);
-    //        template.EquipmentCaptureRatio.Should().Be(0);
-    //        template.Manpower.Should().Be(1000);
-    //        template.TrainingTime.Should().Be(90);
-    //        template.FuelUsage.Should().Be(0);
-    //        template.FuelCapacity.Should().Be(0);
-    //        template.InfantryEquipment.Should().Be(100);
-    //        template.ProductionCost.Should().Be(50);
-    //        template.CombatWidth.Should().Be(2);
-    //    }
-
-    //    [Fact]
-    //    public void TwoInfantryBatallionHasExpectedStats()
-    //    {
-    //        var template = new DivisionTemplate(null,null);
-    //        template.AddToBrigade1(new InfantryBatallion());
-    //        template.AddToBrigade1(new InfantryBatallion());
-
-    //        template.MaxSpeed.Should().Be(4);
-    //        template.HP.Should().Be(50);
-    //        template.Organization.Should().Be(60);
-    //        template.RecoveryRate.Should().Be(0.3m);
-    //        template.Reconnaisance.Should().Be(0);
-    //        template.Suppression.Should().Be(3);
-    //        template.Weight.Should().Be(1);
-    //        template.SupplyUse.Should().Be(0.12m);
-    //        template.AverageReliability.Should().Be(0.9m);
-    //        template.ReliabilityBonus.Should().Be(0);
-    //        template.TricklebackAndWarSupportProtection.Should().Be(0);
-    //        template.ExperienceLoss.Should().Be(0);
-
-    //        template.SoftAttack.Should().Be(12);
-    //        template.HardAttack.Should().Be(2);
-    //        template.AirAttack.Should().Be(0);
-    //        template.Defense.Should().Be(44);
-    //        template.Breakthrough.Should().Be(6);
-    //        template.Armor.Should().Be(0);
-    //        template.Piercing.Should().Be(4);
-    //        template.Initiative.Should().Be(0);
-    //        template.Entrenchment.Should().Be(0);
-    //        template.EquipmentCaptureRatio.Should().Be(0);
-
-    //        template.Manpower.Should().Be(2000);
-    //        template.TrainingTime.Should().Be(90);
-    //        template.FuelUsage.Should().Be(0);
-    //        template.FuelCapacity.Should().Be(0);
-    //        template.InfantryEquipment.Should().Be(200);
-    //        template.ProductionCost.Should().Be(100);
-    //        template.CombatWidth.Should().Be(4);
-    //    }
-
-    //    [Fact]
-    //    public void UnableToPutMobileBatallionWithInfantryBatallion()
-    //    {
-    //        var template = new DivisionTemplate(null, null);
-    //        template.AddToBrigade1(new InfantryBatallion());
-    //        var act = () => template.AddToBrigade1(new CavalryBatallion());
-    //        act.Should().Throw<InvalidOperationException>().WithMessage("This brigade only accepts Infantry batallions.");
-    //    }
 
     //    [Fact]
     //    public void UnableToOverfillABrigade()

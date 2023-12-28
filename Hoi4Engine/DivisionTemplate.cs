@@ -14,6 +14,7 @@ namespace Hoi4Engine
 
         public void AddSupportCompany(SupportCompany batallion)
         {
+            throw new NotImplementedException();
             //var type = batallion.GetType();
             //if (supportCompanies.Any(sc => sc.GetType() == type))
             //{
@@ -52,7 +53,6 @@ namespace Hoi4Engine
             {
                 throw new InvalidOperationException($"This brigade only accepts {brigade[0].Kind} batallions.");
             }
-            //batallion.AddEquipment(equipment, technology);
             brigade.Add(batallion);
         }
 
@@ -104,7 +104,7 @@ namespace Hoi4Engine
             }
             for (var i = 0; i < supportCompanies.Count; i++)
             {
-                //yield return supportCompanies[i];
+                yield return supportCompanies[i];
             }
         }
 

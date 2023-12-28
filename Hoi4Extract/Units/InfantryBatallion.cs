@@ -5,7 +5,7 @@ namespace Hoi4Extract.Units
     /// <summary>
     /// Represents a parsed batallion template
     /// </summary>
-    public class InfantryBattalion(string name) : IParadoxRead
+    public class InfantryBatallion(string name) : IParadoxRead
     {
         public string Name => name;
         public string Abbreviation { get; private set; } = "";
@@ -35,6 +35,10 @@ namespace Hoi4Extract.Units
         public decimal Weight { get; private set; }
         public decimal SupplyConsumption { get; private set; }
         public IDictionary<string, int> EquipmentNeed { get; private set; }
+        /// <summary>
+        /// This is a modifier on speed - a value of 0.6 means this batallion goes 60% faster than
+        /// it would if the modifier was 0.
+        /// </summary>
         public decimal MaxSpeed { get; private set; }
         public IDictionary<string, decimal> Forest { get; private set; }
         public IDictionary<string, decimal> Amphibious { get; private set; }
