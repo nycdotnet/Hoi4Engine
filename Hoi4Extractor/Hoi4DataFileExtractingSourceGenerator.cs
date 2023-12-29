@@ -16,7 +16,7 @@ public class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerator
         if (!Debugger.IsAttached)
         {
             // Uncomment this line to attach the debugger on build.
-            //Debugger.Launch();
+            Debugger.Launch();
         }
 #endif
 
@@ -30,16 +30,53 @@ public class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(compilation, Execute);
     }
 
-    //private static List<string> extraComments = new();
-
     private static bool NodePredicate(SyntaxNode node, CancellationToken _)
     {
-        //Debug.Write("hello");
-        //Console.WriteLine("hi");
-        //extraComments.Add("hi");
+        if (node is not ClassDeclarationSyntax syntax)
+        {
+            return false;
+        }
 
-        return node is ClassDeclarationSyntax;
+        if (syntax.AttributeLists is { Count: 0 })
+        {
+            return false;
+        }
+
+        foreach (var attributeList in syntax.AttributeLists)
+        {
+            foreach (var attribute in attributeList.Attributes)
+            {
+                // might be able to tidy this up a bit...
+                var name = attribute.Name.NormalizeWhitespace().ToFullString();
+                if (name is "Hoi4DataFile" or "Hoi4DataFileAttribute")
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
+
+
+    //var arg = attribute.ArgumentList.Arguments.FirstOrDefault();
+    //if (arg is not null) {
+    //    if (arg.Expression is ExpressionSyntax es)
+    //    {
+    //        es.getv
+    //    }
+    //    //if (arg.Expression is StringLiteralExpression lit)
+    //    //{
+
+    //    //}
+    //    //var argValue = arg.NormalizeWhitespace().ToFullString();
+    //    //var argName = arg.NameEquals.Name.Identifier.ValueText;
+    //}
+    //Debug.Write("hello");
+    //Console.WriteLine("hi");
+    //extraComments.Add("hi");
+
+
 
     private void Execute(SourceProductionContext context, (Compilation Left, ImmutableArray<ClassDeclarationSyntax> Right) tuple)
     {
