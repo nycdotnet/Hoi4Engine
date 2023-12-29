@@ -15,6 +15,7 @@ public class MySourceGen : IIncrementalGenerator
 #if DEBUG
         if (!Debugger.IsAttached)
         {
+            // Uncomment this line to attach the debugger on build.
             //Debugger.Launch();
         }
 #endif

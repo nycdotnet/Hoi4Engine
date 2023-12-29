@@ -12,4 +12,13 @@
     <ProjectReference Include="..\Hoi4Extractor\Hoi4Extractor.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
 
+  <Target Name="CleanSourceGeneratedFiles" BeforeTargets="BeforeBuild" DependsOnTargets="$(BeforeBuildDependsOn)">
+	<RemoveDir Directories="Generated" />
+  </Target>
+
+  <ItemGroup>
+	<Compile Remove="Generated\**" />
+	<Content Include="Generated\**" />
+  </ItemGroup>
+
 </Project>
