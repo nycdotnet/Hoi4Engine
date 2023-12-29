@@ -77,6 +77,5 @@
         public string Kind { get; protected set; }
         public bool IsLegInfantry { get; protected set; }
 
-        //public abstract void AddEquipment(Hoi4Parser equipment, Technology technology);
     }
 }

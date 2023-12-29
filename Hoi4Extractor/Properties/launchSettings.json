@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Hoi4Extractor": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "C:\\Users\\Steve\\Documents\\GitHub\\Hoi4Engine\\Hoi4Extractor\\Hoi4Extractor.csproj"
+    }
+  }
+}

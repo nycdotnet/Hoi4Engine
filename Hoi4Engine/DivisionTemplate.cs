@@ -1,5 +1,4 @@
-﻿using Hoi4Extract;
-using Hoi4Extract.Units;
+﻿using Hoi4Extract.Units;
 
 namespace Hoi4Engine
 {

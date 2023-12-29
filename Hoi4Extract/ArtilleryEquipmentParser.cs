@@ -1,20 +1,20 @@
-﻿using Hoi4Extract.Units;
+﻿using Hoi4Extract.Units.Equipment;
 using Pdoxcl2Sharp;
 
 namespace Hoi4Extract
 {
-    public class InfantryBatallionParser : IParadoxRead
+    public class ArtilleryEquipmentParser : IParadoxRead
     {
-        public List<InfantryBatallion> Battalions = [];
+        public List<ArtilleryEquipment> ArtilleryEquipment = [];
         public bool ready = false;
 
         public void TokenCallback(ParadoxParser parser, string token)
         {
             if (ready && parser.CurrentIndent == 1)
             {
-                Battalions.Add(parser.Parse(new InfantryBatallion(token)));
+                ArtilleryEquipment.Add(parser.Parse(new ArtilleryEquipment(token)));
             }
-            else if (parser.CurrentIndent == 0 && token == "sub_units")
+            else if (parser.CurrentIndent == 0 && token == "equipments")
             {
                 ready = true;
             }

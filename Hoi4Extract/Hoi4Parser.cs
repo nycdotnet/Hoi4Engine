@@ -29,6 +29,12 @@ namespace Hoi4Extract
             return result.Battalions;
         }
 
+        public static List<CavalryBatallion> ParseCavalryBattalions(FileStream file)
+        {
+            var result = ParadoxParser.Parse(file, new CavalryBatallionParser());
+            return result.Battalions;
+        }
+
 
         private static void Normalize(List<Equipment> equipment)
         {

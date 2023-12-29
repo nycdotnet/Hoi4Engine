@@ -14,6 +14,7 @@ namespace Hoi4Extract
             infantryEquipment = ImmutableDictionary<string, IEnumerable<InfantryEquipment>>.Empty;
             artilleryEquipment = ImmutableDictionary<string, IEnumerable<ArtilleryEquipment>>.Empty;
             infantryBatallions = ImmutableDictionary<string, IEnumerable<InfantryBatallion>>.Empty;
+            cavalryBatallions = ImmutableDictionary<string, IEnumerable<CavalryBatallion>>.Empty;
         }
 
         public string Hoi4Root { get; }
@@ -21,6 +22,7 @@ namespace Hoi4Extract
         private ImmutableDictionary<string, IEnumerable<InfantryEquipment>> infantryEquipment;
         private ImmutableDictionary<string, IEnumerable<ArtilleryEquipment>> artilleryEquipment;
         private ImmutableDictionary<string, IEnumerable<InfantryBatallion>> infantryBatallions;
+        private ImmutableDictionary<string, IEnumerable<CavalryBatallion>> cavalryBatallions;
 
         public IEnumerable<InfantryEquipment> GetInfantryEquipment(string? relativeFilePath = null)
         {
@@ -63,6 +65,20 @@ namespace Hoi4Extract
             using var file = new FileStream(path, FileMode.Open, FileAccess.Read);
             battalions = Hoi4Parser.ParseInfantryBattalions(file);
             infantryBatallions = infantryBatallions.Add(path, battalions);
+            return battalions;
+        }
+
+        public IEnumerable<CavalryBatallion> GetCavalryBatallions(string? relativeFilePath = null)
+        {
+            var path = Path.Combine(Hoi4Root, relativeFilePath ?? @"common\units\cavalry.txt");
+            if (cavalryBatallions.TryGetValue(path, out var battalions) && battalions is not null)
+            {
+                return battalions;
+            }
+
+            using var file = new FileStream(path, FileMode.Open, FileAccess.Read);
+            battalions = Hoi4Parser.ParseCavalryBattalions(file);
+            cavalryBatallions = cavalryBatallions.Add(path, battalions);
             return battalions;
         }
     }

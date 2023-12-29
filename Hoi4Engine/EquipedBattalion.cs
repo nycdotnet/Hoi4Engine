@@ -3,14 +3,14 @@ using Hoi4Extract.Units.Equipment;
 
 namespace Hoi4Engine
 {
-    public class ParsedBattalion : Batallion
+    public class EquipedBattalion : Batallion
     {
         private Dictionary<string, List<(InfantryEquipment Equipment, int Quantity)>> _equipment = new();
         public InfantryBatallion UnitTemplate { get; }
 
-        public ParsedBattalion(InfantryBatallion battalionTemplate)
+        public EquipedBattalion(Batallion battalionTemplate)
         {
-            UnitTemplate = battalionTemplate;
+            //UnitTemplate = battalionTemplate;
         }
 
         public void SetFullEquipment(InfantryEquipment equipment)
