@@ -3,7 +3,7 @@
 namespace Hoi4Data.common.units
 {
     [Hoi4DataFile("common/units/cavalry.txt")]
-    public class Cavalry
+    public partial class Cavalry
     {
 
     }
