@@ -8,7 +8,7 @@ using System.Threading;
 namespace Hoi4Extractor;
 
 [Generator]
-public class MySourceGen : IIncrementalGenerator
+public class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
