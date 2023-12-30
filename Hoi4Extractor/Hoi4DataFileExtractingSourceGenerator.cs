@@ -1,33 +1,46 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 
 namespace Hoi4Extractor;
 
+
 [Generator]
 public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerator
 {
     private static readonly string[] Hoi4DataFileAttributeNames = [nameof(Hoi4DataFileAttribute), "Hoi4DataFile"];
 
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+    public string Hoi4Root { get; }
+
+    public Hoi4DataFileExtractingSourceGenerator()
     {
 #if DEBUG
         if (!Debugger.IsAttached)
         {
             // Uncomment this line to attach the debugger on build.
-            //Debugger.Launch();
+            // Debugger.Launch();
         }
 #endif
 
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
+        Hoi4Root = Path.GetFullPath(Path.Combine(Environment.GetEnvironmentVariable("ProgramFiles(x86)"), @"Steam/steamapps/common/Hearts of Iron IV"));
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
+
+    }
+
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
         var provider = context.SyntaxProvider.CreateSyntaxProvider(
             predicate: NodePredicate,
             transform: static (ctx, _) => (ClassDeclarationSyntax)ctx.Node
-        ).Where(m => m is not null);
+        ).Where(static s => s is not null);
 
         var compilation = context.CompilationProvider.Combine(provider.Collect());
 
@@ -73,6 +86,12 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
 
         foreach (var fileSpec in filesToExtract)
         {
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
+            // NOTE: The suggestion is to load the files via MSBuild
+            using var pdxFile = new MemoryStream(File.ReadAllBytes(Path.Combine(Hoi4Root, fileSpec.RelativePath)));
+            var len = pdxFile.Length;
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
+
             var code = new StringBuilder();
             code.Append($$"""
                 namespace {{fileSpec.Namespace}};
