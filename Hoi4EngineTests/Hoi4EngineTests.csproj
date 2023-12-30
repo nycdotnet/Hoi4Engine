@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Hoi4Data\Hoi4Data.csproj" />
     <ProjectReference Include="..\Hoi4Engine\Hoi4Engine.csproj" />
     <ProjectReference Include="..\Hoi4Extract\Hoi4Extract.csproj" />
   </ItemGroup>

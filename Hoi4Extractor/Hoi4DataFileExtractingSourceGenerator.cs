@@ -3,20 +3,24 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using System.Threading;
 
 namespace Hoi4Extractor;
 
 [Generator]
-public class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerator
+public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerator
 {
+    private static readonly string[] Hoi4DataFileAttributeNames = [nameof(Hoi4DataFileAttribute), "Hoi4DataFile"];
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
 #if DEBUG
         if (!Debugger.IsAttached)
         {
             // Uncomment this line to attach the debugger on build.
-            Debugger.Launch();
+            //Debugger.Launch();
         }
 #endif
 
@@ -42,13 +46,17 @@ public class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerator
             return false;
         }
 
+        if (!(syntax.Modifiers.OfType<SyntaxToken>().Any(m => m.ValueText is "partial") && syntax.Modifiers.OfType<SyntaxToken>().Any(m => m.ValueText is "public")))
+        {
+            return false;
+        }
+
         foreach (var attributeList in syntax.AttributeLists)
         {
-            foreach (var attribute in attributeList.Attributes)
+            foreach (var attribute in attributeList.Attributes.Where(a => a.Name is IdentifierNameSyntax))
             {
-                // might be able to tidy this up a bit...
-                var name = attribute.Name.NormalizeWhitespace().ToFullString();
-                if (name is "Hoi4DataFile" or "Hoi4DataFileAttribute")
+                var name = ((IdentifierNameSyntax)attribute.Name).Identifier.ValueText;
+                if (Hoi4DataFileAttributeNames.Contains(name))
                 {
                     return true;
                 }
@@ -58,56 +66,76 @@ public class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerator
         return false;
     }
 
-
-    //var arg = attribute.ArgumentList.Arguments.FirstOrDefault();
-    //if (arg is not null) {
-    //    if (arg.Expression is ExpressionSyntax es)
-    //    {
-    //        es.getv
-    //    }
-    //    //if (arg.Expression is StringLiteralExpression lit)
-    //    //{
-
-    //    //}
-    //    //var argValue = arg.NormalizeWhitespace().ToFullString();
-    //    //var argName = arg.NameEquals.Name.Identifier.ValueText;
-    //}
-    //Debug.Write("hello");
-    //Console.WriteLine("hi");
-    //extraComments.Add("hi");
-
-
-
     private void Execute(SourceProductionContext context, (Compilation Left, ImmutableArray<ClassDeclarationSyntax> Right) tuple)
     {
-        var (compilation, syntaxes) = tuple;
+        var (compilation, classes) = tuple;
+        var filesToExtract = GetFilesToExtract(compilation, classes);
 
-        var names = new List<string>();
+        foreach (var fileSpec in filesToExtract)
+        {
+            var code = new StringBuilder();
+            code.Append($$"""
+                namespace {{fileSpec.Namespace}};
 
-        foreach (var syntax in syntaxes)
+                public partial class {{fileSpec.ClassName}} {
+                    public static string RelativePath => "{{fileSpec.RelativePath}}";
+                }
+
+                """);
+
+            context.AddSource($"{fileSpec.ClassName}.g.cs", code.ToString());
+        }
+    }
+
+    private static List<DataFileToExtract> GetFilesToExtract(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> classes)
+    {
+        var result = new List<DataFileToExtract>();
+        foreach (var classSyntax in classes.Where(c => c.Parent is NamespaceDeclarationSyntax))
         {
             var symbol = compilation
-                .GetSemanticModel(syntax.SyntaxTree)
-                .GetDeclaredSymbol(syntax) as INamedTypeSymbol;
+                .GetSemanticModel(classSyntax.SyntaxTree)
+                .GetDeclaredSymbol(classSyntax) as INamedTypeSymbol;
 
+            foreach (var list in classSyntax.AttributeLists)
+            {
+                foreach (var attribute in list.Attributes.Where(a => a.Name is IdentifierNameSyntax))
+                {
+                    var name = ((IdentifierNameSyntax)attribute.Name).Identifier.ValueText;
+                    if (Hoi4DataFileAttributeNames.Contains(name))
+                    {
+                        var toGen = new DataFileToExtract
+                        {
+                            Namespace = ((QualifiedNameSyntax)((NamespaceDeclarationSyntax)classSyntax.Parent).Name).NormalizeWhitespace().ToFullString(),
+                            ClassName = classSyntax.Identifier.ValueText
+                        };
 
-            names.Add($"\"{symbol.ToDisplayString()}\"");
-        }
-        //{{string.Join("\n", extraComments)}}
-        var theCode = $$"""
-            namespace Hoi4Data.Generated;
+                        for (var i = 0; i < attribute.ArgumentList.Arguments.Count; i++)
+                        {
+                            var arg = attribute.ArgumentList.Arguments[i];
+                            if (arg.NameColon is null)
+                            {
+                                if (i == 0)
+                                {
+                                    toGen.RelativePath = ((LiteralExpressionSyntax)arg.Expression).Token.ValueText;
+                                }
+                            }
+                            else
+                            {
+                                if (arg.NameColon.Expression is IdentifierNameSyntax ins && ins.Identifier.ValueText == "RelativePath")
+                                {
+                                    toGen.RelativePath = ((LiteralExpressionSyntax)arg.Expression).Token.ValueText;
+                                }
+                            }
+                        }
 
-            /*
-            
-            */
-            public static class MyGeneratedClass {
-                public static List<string> Names = new() { {{string.Join(",", names)}} };
-                
+                        if (!string.IsNullOrEmpty(toGen.RelativePath))
+                        {
+                            result.Add(toGen);
+                        }
+                    }
+                }
             }
-            """;
-
-        ////public static string comments = "{{(names.Count == 0)}}";
-
-        context.AddSource("MyGeneratedClass.g.cs", theCode);
+        }
+        return result;
     }
 }

@@ -2,9 +2,8 @@
 
 namespace Hoi4Data.common.units
 {
-    [Hoi4DataFile("common/units/infantry.txt")]
+    [Hoi4DataFileAttribute("common/units/infantry.txt")]
     public partial class Infantry
     {
-
     }
 }

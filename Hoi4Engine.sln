@@ -11,15 +11,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
+		.gitignore = .gitignore
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hoi4Extract", "Hoi4Extract\Hoi4Extract.csproj", "{E5042027-2DE4-4626-85A4-85D031046A0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hoi4Data", "Hoi4Data\Hoi4Data.csproj", "{E45CAF37-37F5-408A-A931-6C232C00AAFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hoi4Data", "Hoi4Data\Hoi4Data.csproj", "{E45CAF37-37F5-408A-A931-6C232C00AAFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hoi4Extractor", "Hoi4Extractor\Hoi4Extractor.csproj", "{3F125709-5450-4C7D-A193-1325DF5183B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hoi4Extractor", "Hoi4Extractor\Hoi4Extractor.csproj", "{3F125709-5450-4C7D-A193-1325DF5183B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

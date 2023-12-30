@@ -21,4 +21,8 @@
 	<Content Include="Generated\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Generated\Hoi4Extractor\Hoi4Extractor.Hoi4DataFileExtractingSourceGenerator\" />
+  </ItemGroup>
+
 </Project>
