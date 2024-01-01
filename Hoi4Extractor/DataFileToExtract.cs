@@ -1,4 +1,6 @@
-﻿namespace Hoi4Extractor;
+﻿using System;
+
+namespace Hoi4Extractor;
 
 public partial class Hoi4DataFileExtractingSourceGenerator
 {
@@ -7,5 +9,6 @@ public partial class Hoi4DataFileExtractingSourceGenerator
         public string Namespace { get; set; }
         public string ClassName { get; set; }
         public string RelativePath { get; set; }
+        public Type Type { get; set; }
     }
 }

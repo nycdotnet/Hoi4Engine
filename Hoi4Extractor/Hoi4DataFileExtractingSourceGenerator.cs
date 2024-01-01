@@ -12,7 +12,6 @@ using System.Threading;
 
 namespace Hoi4Extractor;
 
-
 [Generator]
 public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerator
 {
@@ -65,7 +64,7 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
             return false;
         }
 
-        if (!syntax.BaseList.Types.Any(t => t.Type.ToString() == nameof(SubunitCollection)))
+        if (syntax.BaseList?.Types.Any(t => t.Type.ToString() is nameof(SubunitCollection) or nameof(EquipmentCollection)) is false or null)
         {
             return false;
         }
@@ -93,15 +92,16 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
         foreach (var fileSpec in filesToExtract)
         {
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-            
             // NOTE: The suggestion is to load the files via MSBuild - not sure yet how to do this.
             using var pdxFile = new MemoryStream(File.ReadAllBytes(Path.Combine(Hoi4Root, fileSpec.RelativePath)));
-            var len = pdxFile.Length;
-            var subunits = ParadoxParser.Parse(pdxFile, new SubunitCollection());
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers            
 
-#pragma warning restore RS1035 // Do not use APIs banned for analyzers
+            string code = "";
 
-            var code = $$"""
+            if (fileSpec.Type == typeof(SubunitCollection))
+            {
+                var subunits = ParadoxParser.Parse(pdxFile, new SubunitCollection());
+                code = $$"""
                 using Hoi4Extractor;
                 namespace {{fileSpec.Namespace}};
 
@@ -115,8 +115,47 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
                 }
 
                 """;
+            }
+            else if (fileSpec.Type == typeof(EquipmentCollection))
+            {
+                var equipment = ParadoxParser.Parse(pdxFile, new EquipmentCollection());
+                code = $$"""
+                using Hoi4Extractor;
+                namespace {{fileSpec.Namespace}};
 
-            context.AddSource($"{fileSpec.ClassName}.g.cs", code);
+                public partial class {{fileSpec.ClassName}} {
+                    // generated {{DateTime.UtcNow}}
+                    public static string RelativePath => "{{fileSpec.RelativePath}}";
+                    public {{fileSpec.ClassName}}()
+                    {
+                {{outputEquipment(equipment)}}
+                    }
+                }
+
+                """;
+            }
+            
+            if (!string.IsNullOrEmpty(code))
+            {
+                context.AddSource($"{Path.GetDirectoryName(fileSpec.RelativePath)}/{fileSpec.ClassName}.g.cs", code);
+            }
+        }
+
+        static string outputEquipment(EquipmentCollection equipment)
+        {
+            var sb = new StringBuilder();
+            sb.Append("        Equipment e;\n");
+            foreach (var e in equipment)
+            {
+                sb.Append($$"""
+                                    e = new Equipment("{{e.Name}}");
+                                    // properties here.
+                                    {{(e.UnsupportedTokens.Any() ? $"// unsupported tokens: {string.Join(",", e.UnsupportedTokens)}" : "")}}
+                                    Equipment.Add(e);
+
+                            """);
+            }
+            return sb.ToString();
         }
 
         static string outputSubunits(SubunitCollection subunits)
@@ -225,7 +264,10 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
                         var toGen = new DataFileToExtract
                         {
                             Namespace = ((QualifiedNameSyntax)((NamespaceDeclarationSyntax)classSyntax.Parent).Name).NormalizeWhitespace().ToFullString(),
-                            ClassName = classSyntax.Identifier.ValueText
+                            ClassName = classSyntax.Identifier.ValueText,
+                            Type = classSyntax.BaseList.Types.Any(t => t.Type.ToString() == nameof(SubunitCollection)) ? typeof(SubunitCollection) :
+                                    classSyntax.BaseList.Types.Any(t => t.Type.ToString() == nameof(EquipmentCollection)) ? typeof(EquipmentCollection) :
+                                    null
                         };
 
                         for (var i = 0; i < attribute.ArgumentList.Arguments.Count; i++)
@@ -247,7 +289,7 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
                             }
                         }
 
-                        if (!string.IsNullOrEmpty(toGen.RelativePath))
+                        if (!string.IsNullOrEmpty(toGen.RelativePath) && toGen.Type is not null)
                         {
                             result.Add(toGen);
                         }
