@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Hoi4Extract;
+using Hoi4Data.common.units.equipment;
 
 namespace Hoi4EngineTests
 {
@@ -8,8 +8,7 @@ namespace Hoi4EngineTests
         [Fact]
         public void ParsingArtilleryWorks()
         {
-            var parsingContext = new Hoi4ParsingContext();
-            var artilleryEquipment = parsingContext.GetArtilleryEquipment();
+            var artilleryEquipment = new ArtilleryEquipment();
 
             artilleryEquipment.Should().HaveCount(9);
 

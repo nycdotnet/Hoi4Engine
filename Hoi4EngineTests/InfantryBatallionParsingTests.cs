@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Hoi4Data.common.units;
 using Hoi4Extract;
 
 namespace Hoi4EngineTests
@@ -8,8 +9,7 @@ namespace Hoi4EngineTests
         [Fact]
         public void ParsingInfantryBatallionsWorks()
         {
-            var parsingContext = new Hoi4ParsingContext();
-            var batallions = parsingContext.GetInfantryBatallions();
+            var batallions = new Infantry();
             batallions.Should().HaveCount(12);
 
             {
