@@ -13,6 +13,18 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+    <PackageReference Include="Pdoxcl2Sharp" Version="0.6.1" PrivateAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
+
+	<PropertyGroup>
+		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+	</PropertyGroup>
+
+	<Target Name="GetDependencyTargetPaths" AfterTargets="ResolvePackageDependenciesForBuild">
+		<ItemGroup>
+			<TargetPathWithTargetPlatformMoniker Include="$(PkgPdoxcl2Sharp)\lib\netstandard2.0\Pdoxcl2Sharp.dll" IncludeRuntimeDependency="false"></TargetPathWithTargetPlatformMoniker>
+		</ItemGroup>
+	</Target>
+
 
 </Project>

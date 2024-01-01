@@ -6,10 +6,16 @@ namespace Hoi4EngineTests
     public class SourceGeneratedDataTests
     {
         [Fact]
-        public void SourceGeneratedDataFilesHavePropertyThatMatchesAttribute()
+        public void SourceGeneratedCavalrySubunitsAreAsExpected()
         {
-            Cavalry.RelativePath.Should().Be("common/units/cavalry.txt");
-            Infantry.RelativePath.Should().Be("common/units/infantry.txt");
+            var cavalryType = new Cavalry();
+            cavalryType.Subunits.Should().HaveCount(2);
+            var cav = cavalryType.Subunits.Single(su => su.Name == "cavalry");
+
+            cav.Abbreviation.Should().Be("CAV");
+            cav.MaxOrganization.Should().Be(70);
+
+            cavalryType.Subunits.Single(su => su.Name == "camelry").Abbreviation.Should().Be("CAM");
         }
     }
 }

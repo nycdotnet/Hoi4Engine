@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Pdoxcl2Sharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -25,7 +26,7 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
         if (!Debugger.IsAttached)
         {
             // Uncomment this line to attach the debugger on build.
-            // Debugger.Launch();
+             //Debugger.Launch();
         }
 #endif
 
@@ -87,24 +88,118 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
         foreach (var fileSpec in filesToExtract)
         {
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-            // NOTE: The suggestion is to load the files via MSBuild
+            
+            // NOTE: The suggestion is to load the files via MSBuild - not sure yet how to do this.
             using var pdxFile = new MemoryStream(File.ReadAllBytes(Path.Combine(Hoi4Root, fileSpec.RelativePath)));
             var len = pdxFile.Length;
+            var subunits = ParadoxParser.Parse(pdxFile, new SubunitCollection());
+
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
 
-            var code = new StringBuilder();
-            code.Append($$"""
+            var code = $$"""
+                using Hoi4Extractor;
                 namespace {{fileSpec.Namespace}};
 
                 public partial class {{fileSpec.ClassName}} {
+                    // generated {{DateTime.UtcNow}}
                     public static string RelativePath => "{{fileSpec.RelativePath}}";
+                    public {{fileSpec.ClassName}}()
+                    {
+                {{outputSubunits(subunits)}}
+                    }
                 }
 
-                """);
+                """;
 
-            context.AddSource($"{fileSpec.ClassName}.g.cs", code.ToString());
+            context.AddSource($"{fileSpec.ClassName}.g.cs", code);
+        }
+
+        static string outputSubunits(SubunitCollection subunits)
+        {
+            var sb = new StringBuilder();
+            sb.Append("        Subunit u;\n");
+            foreach (var su in subunits)
+            {
+                sb.Append($$"""
+                                    u = new Subunit("{{su.Name}}");
+                            {{outputSubunitProperties(su)}}
+                                    {{(su.UnsupportedTokens.Any() ? $"// unsupported tokens: {string.Join(",", su.UnsupportedTokens)}" : "")}}
+                                    Subunits.Add(u);
+
+                            """);
+            }
+            return sb.ToString();
+        }
+
+        static string outputSubunitProperties(Subunit su)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var property in typeof(Subunit).GetProperties().Where(p => !SpecialSubunitProperties.Contains(p.Name)))
+            {
+                if (property.PropertyType == typeof(string))
+                {
+                    var p = (string)property.GetValue(su);
+                    sb.Append($"        u.{property.Name} = \"{p}\";\n");
+                }
+                else if (property.PropertyType == typeof(int))
+                {
+                    var p = property.GetValue(su).ToString();
+                    sb.Append($"        u.{property.Name} = {p};\n");
+                }
+                else if (property.PropertyType == typeof(decimal))
+                {
+                    var p = property.GetValue(su).ToString();
+                    sb.Append($"        u.{property.Name} = {p}m;\n");
+                }
+                else if (property.PropertyType == typeof(bool))
+                {
+                    var p = ((bool)property.GetValue(su)) ? "true" : "false";
+                    sb.Append($"        u.{property.Name} = {p};\n");
+                }
+                else if (property.PropertyType == typeof(List<string>))
+                {
+                    var p = (List<string>)property.GetValue(su);
+                    if (p is not null and not { Count : 0 })
+                    {
+                        sb.Append($"        u.{property.Name}.AddRange([{string.Join(",", p.Select(element => $"\"{element}\""))}]);\n");
+                    }
+                }
+                else if (property.PropertyType == typeof(IDictionary<string, int>))
+                {
+                    var p = (Dictionary<string, int>)property.GetValue(su);
+                    if (p is not null and not { Count: 0 })
+                    {
+                        sb.Append($"        u.{property.Name} = new Dictionary<string, int>();\n");
+                        foreach (var kvp in p)
+                        {
+                            sb.Append($"        u.{property.Name}[\"{kvp.Key}\"] = {kvp.Value};\n");
+                        }
+                    }
+                }
+                else if (property.PropertyType == typeof(IDictionary<string, decimal>))
+                {
+                    var p = (Dictionary<string, decimal>)property.GetValue(su);
+                    if (p is not null and not { Count: 0 })
+                    {
+                        sb.Append($"        u.{property.Name} = new Dictionary<string, decimal>();\n");
+                        foreach (var kvp in p)
+                        {
+                            sb.Append($"        u.{property.Name}[\"{kvp.Key}\"] = {kvp.Value}m;\n");
+                        }
+                    }
+                }
+                else
+                {
+                    sb.Append($"        // type of {property.PropertyType} ({property.Name}) not supported.\n");
+                }
+            }
+            return sb.ToString();
         }
     }
+
+    private static HashSet<string> SpecialSubunitProperties = ["Name", "UnsupportedTokens"];
+
 
     private static List<DataFileToExtract> GetFilesToExtract(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> classes)
     {
