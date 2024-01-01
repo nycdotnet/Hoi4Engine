@@ -65,7 +65,7 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
             return false;
         }
 
-        if (!syntax.BaseList.Types.Any(t => t.Type.ToString() == "SubunitCollection"))
+        if (!syntax.BaseList.Types.Any(t => t.Type.ToString() == nameof(SubunitCollection)))
         {
             return false;
         }
