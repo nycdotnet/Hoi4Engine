@@ -119,6 +119,7 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
             else if (fileSpec.Type == typeof(EquipmentCollection))
             {
                 var equipment = ParadoxParser.Parse(pdxFile, new EquipmentCollection());
+                equipment.Normalize();
                 code = $$"""
                 using Hoi4Extractor;
                 namespace {{fileSpec.Namespace}};
@@ -149,11 +150,75 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
             {
                 sb.Append($$"""
                                     e = new Equipment("{{e.Name}}");
-                                    // properties here.
+                            {{outputEquipmentProperties(e)}}
                                     {{(e.UnsupportedTokens.Any() ? $"// unsupported tokens: {string.Join(",", e.UnsupportedTokens)}" : "")}}
                                     Equipment.Add(e);
 
                             """);
+            }
+            return sb.ToString();
+        }
+
+        static string outputEquipmentProperties(Equipment e)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var property in typeof(Equipment).GetProperties().Where(p => !SpecialProperties.Contains(p.Name)))
+            {
+                if (property.PropertyType == typeof(string))
+                {
+                    var p = (string)property.GetValue(e);
+                    sb.Append($"        e.{property.Name} = \"{p}\";\n");
+                }
+                else if (property.PropertyType == typeof(int) || property.PropertyType == typeof(int?))
+                {
+                    var p = property.GetValue(e);
+                    if (p is not null)
+                    {
+                        sb.Append($"        e.{property.Name} = {p};\n");
+                    }
+                }
+                else if (property.PropertyType == typeof(decimal) || property.PropertyType == typeof(decimal?))
+                {
+                    var p = property.GetValue(e);
+                    if (p is not null)
+                    {
+                        sb.Append($"        e.{property.Name} = {p}m;\n");
+                    }
+                }
+                else if (property.PropertyType == typeof(bool) || property.PropertyType == typeof(bool?))
+                {
+                    var p = property.GetValue(e);
+                    if (p is not null)
+                    {
+                        var boolCode = ((bool)property.GetValue(e)) ? "true" : "false";
+                        sb.Append($"        e.{property.Name} = {boolCode};\n");
+                    }
+                }
+                else if (property.PropertyType == typeof(IList<string>))
+                {
+                    var p = (List<string>)property.GetValue(e);
+                    if (p is not null and not { Count: 0 })
+                    {
+                        sb.Append($"        e.{property.Name} = [{string.Join(",", p.Select(element => $"\"{element}\""))}];\n");
+                    }
+                }
+                else if (property.PropertyType == typeof(IDictionary<string, int>))
+                {
+                    var p = (Dictionary<string, int>)property.GetValue(e);
+                    if (p is not null and not { Count: 0 })
+                    {
+                        sb.Append($"        e.{property.Name} = new Dictionary<string, int>();\n");
+                        foreach (var kvp in p)
+                        {
+                            sb.Append($"        e.{property.Name}[\"{kvp.Key}\"] = {kvp.Value};\n");
+                        }
+                    }
+                }
+                else
+                {
+                    sb.Append($"        // type of {property.PropertyType} ({property.Name}) not supported.\n");
+                }
             }
             return sb.ToString();
         }
@@ -179,7 +244,7 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
         {
             var sb = new StringBuilder();
 
-            foreach (var property in typeof(Subunit).GetProperties().Where(p => !SpecialSubunitProperties.Contains(p.Name)))
+            foreach (var property in typeof(Subunit).GetProperties().Where(p => !SpecialProperties.Contains(p.Name)))
             {
                 if (property.PropertyType == typeof(string))
                 {
@@ -242,8 +307,7 @@ public partial class Hoi4DataFileExtractingSourceGenerator : IIncrementalGenerat
         }
     }
 
-    private static HashSet<string> SpecialSubunitProperties = ["Name", "UnsupportedTokens"];
-
+    private static readonly HashSet<string> SpecialProperties = ["Name", "UnsupportedTokens"];
 
     private static List<DataFileToExtract> GetFilesToExtract(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> classes)
     {

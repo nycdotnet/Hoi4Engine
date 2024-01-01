@@ -1,6 +1,7 @@
 ﻿using Pdoxcl2Sharp;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Hoi4Extractor
 {
@@ -25,6 +26,32 @@ namespace Hoi4Extractor
             else if (parser.CurrentIndent == 0 && token == "equipments")
             {
                 parseStateEquipmentsFound = true;
+            }
+        }
+
+        internal void Normalize()
+        {
+            if (Equipment is { Count: > 0 })
+            {
+                var cache = new Dictionary<string, Equipment>();
+                foreach (var item in Equipment)
+                {
+                    if (string.IsNullOrEmpty(item?.Archetype))
+                    {
+                        continue;
+                    }
+
+                    if (!cache.TryGetValue(item!.Archetype!, out var archetype))
+                    {
+                        archetype = Equipment.FirstOrDefault(ie => ie.Name == item.Archetype);
+                        if (archetype is null)
+                        {
+                            continue;
+                        }
+                        cache.Add(archetype.Name, archetype);
+                    }
+                    item?.Normalize(archetype);
+                }
             }
         }
     }

@@ -8,16 +8,16 @@ namespace Hoi4Extractor
     {
         public string Name { get; } = name;
         public bool IsArchetype { get; set; }
-        public string Archetype { get; set; } = "";
+        public string Archetype { get; set; }
         public int? Year { get; set; }
-        public string Picture { get; set; } = "";
-        public string Parent { get; set; } = "";
+        public string Picture { get; set; }
+        public string Parent { get; set; }
         public int? Priority { get; set; }
         public int? VisualLevel { get; set; }
         public bool? IsBuildable { get; set; }
-        public IList<string>? Type { get; set; }
-        public string? GroupBy { get; set; }
-        public string? InterfaceCategory { get; set; }
+        public IList<string> Type { get; set; }
+        public string GroupBy { get; set; }
+        public string InterfaceCategory { get; set; }
         public bool? Active { get; set; }
         public decimal? Reliability { get; set; }
         public decimal? MaximumSpeed { get; set; }
@@ -79,6 +79,99 @@ namespace Hoi4Extractor
                 case "fuel_consumption": FuelConsumption = (decimal)parser.ReadDouble(); break;
                 default: UnsupportedTokens.Add(token); break;
             }
+        }
+
+        internal void Normalize(Equipment archetype)
+        {
+            if (!Year.HasValue)
+            {
+                Year = archetype.Year;
+            }
+            if (string.IsNullOrEmpty(Picture))
+            {
+                Picture = archetype.Picture;
+            }
+            if (!IsBuildable.HasValue)
+            {
+                IsBuildable = archetype.IsBuildable;
+            }
+
+            Type ??= archetype.Type;
+
+            if (string.IsNullOrEmpty(GroupBy))
+            {
+                GroupBy = archetype.GroupBy;
+            }
+            if (string.IsNullOrEmpty(InterfaceCategory))
+            {
+                InterfaceCategory = archetype.InterfaceCategory;
+            }
+            if (!Active.HasValue)
+            {
+                Active = archetype.Active;
+            }
+            if (!Reliability.HasValue)
+            {
+                Reliability = archetype.Reliability;
+            }
+            if (!MaximumSpeed.HasValue)
+            {
+                MaximumSpeed = archetype.MaximumSpeed;
+            }
+            if (!Defense.HasValue)
+            {
+                Defense = archetype.Defense;
+            }
+            if (!Breakthrough.HasValue)
+            {
+                Breakthrough = archetype.Breakthrough;
+            }
+            if (!Hardness.HasValue)
+            {
+                Hardness = archetype.Hardness;
+            }
+            if (!ArmorValue.HasValue)
+            {
+                ArmorValue = archetype.ArmorValue;
+            }
+            if (!SoftAttack.HasValue)
+            {
+                SoftAttack = archetype.SoftAttack;
+            }
+            if (!HardAttack.HasValue)
+            {
+                HardAttack = archetype.HardAttack;
+            }
+            if (!Piercing.HasValue)
+            {
+                Piercing = archetype.Piercing;
+            }
+            if (!AirAttack.HasValue)
+            {
+                AirAttack = archetype.AirAttack;
+            }
+            if (!LendLeaseCost.HasValue)
+            {
+                LendLeaseCost = archetype.LendLeaseCost;
+            }
+            if (!BuildCostIC.HasValue)
+            {
+                BuildCostIC = archetype.BuildCostIC;
+            }
+            if (string.IsNullOrEmpty(Parent))
+            {
+                Parent = archetype.Parent;
+            }
+            if (!Priority.HasValue)
+            {
+                Priority = archetype.Priority;
+            }
+            if (!VisualLevel.HasValue)
+            {
+                VisualLevel = archetype.VisualLevel;
+            }
+
+            Resources ??= archetype.Resources;
         }
     }
 }
