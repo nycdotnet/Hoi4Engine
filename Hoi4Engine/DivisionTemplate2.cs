@@ -1,5 +1,4 @@
 ﻿using Hoi4Extractor;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Hoi4Engine
 {
@@ -11,6 +10,7 @@ namespace Hoi4Engine
         private readonly List<Subunit> brigade4 = new(5);
         private readonly List<Subunit> brigade5 = new(5);
         private readonly List<Subunit> supportCompanies = new(5);
+        private bool statsCalculated = false;
 
         public void AddToBrigade1(Subunit batallion)
         {
@@ -28,10 +28,96 @@ namespace Hoi4Engine
             {
                 throw new InvalidOperationException($"This brigade only accepts {brigade[0].Group} batallions.");
             }
+            statsCalculated = false;
             brigade.Add(batallion);
         }
 
-        public decimal SoftAttack => AllBatallionsAndSupportCompanies().Sum(b => b.SoftAttack);
+        private decimal _softAttack;
+        public decimal SoftAttack
+        {
+            get
+            {
+                if (!statsCalculated)
+                {
+                    CalculateStats();
+                }
+                return _softAttack;
+            }
+        }
+
+        private decimal _averageReliability;
+        public decimal AverageReliability
+        {
+            get
+            {
+                if (!statsCalculated)
+                {
+                    CalculateStats();
+                }
+                return _averageReliability;
+            }
+        }
+
+        private void ResetStats()
+        {
+            _softAttack = 0;
+        }
+
+        private void CalculateStats()
+        {
+            ResetStats();
+            var availableEquipment = CurrentEquipment().ToDictionary(e => e.archetype, e => e.items);
+
+            _averageReliability = Math.Round(CurrentEquipment()
+                .Where(e => e.items.Sum(x => x.Quantity) > 0 && e.items.Any(x => x.Equipment.Reliability.HasValue))
+                .Select(e => {
+                    var qty = e.items.Sum(x => x.Quantity);
+                    return e.items.Select(x => (x.Equipment.Reliability ?? 0) * x.Quantity / qty).Sum();
+                }).DefaultIfEmpty(1m).Average(), 3);
+
+            foreach (var batallion in AllBatallionsAndSupportCompanies())
+            {
+                _softAttack += batallion.SoftAttack;
+                if (batallion.EssentialEquipment is { Count: > 0})
+                {
+                    throw new NotSupportedException("Essential equipment is not yet supported.");
+                }
+                foreach (var need in batallion.EquipmentNeed)
+                {
+                    var quantityFound = 0;
+                    if (availableEquipment.TryGetValue(need.Key, out var equip))
+                    {
+                        for (var i = 0; i < equip.Count; i++)
+                        {
+                            var e = equip[i];
+                            var remainder = e.Quantity - need.Value;
+                            if (remainder >= 0)
+                            {
+                                quantityFound += need.Value;
+                                if (e.Equipment.SoftAttack.HasValue)
+                                {
+                                    _softAttack += e.Equipment.SoftAttack.Value;
+                                }
+                                equip[i] = (e.Equipment, remainder);
+                            }
+                            else
+                            {
+                                quantityFound += e.Quantity;
+                                if (e.Equipment.SoftAttack.HasValue)
+                                {
+                                    _softAttack += e.Equipment.SoftAttack.Value * e.Quantity / need.Value;
+                                }
+                                equip[i] = (e.Equipment, 0);
+                            }
+                            if (quantityFound == need.Value)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         private IEnumerable<Subunit> AllBatallions()
         {
@@ -87,12 +173,46 @@ namespace Hoi4Engine
 
         public void AddEquipment(Equipment equipment, int quantity)
         {
-            // need to figure out how this should work - by the archetype??
-            throw new NotImplementedException();
+            if (NeededEquipment.TryGetValue(equipment.Archetype, out var needed))
+            {
+                if (_equipment.TryGetValue(equipment.Archetype, out var current))
+                {
+                    if (current.Sum(e => e.Quantity) + quantity > needed)
+                    {
+                        throw new NotImplementedException("Upgrade or refill logic is not currently implemented.");
+                    }
+                    var index = current.FindIndex(c => c.Equipment.Name == equipment.Name);
+                    if (index == -1)
+                    {
+                        current.Add((equipment, quantity));
+                    }
+                    else
+                    {
+                        current[index] = (current[index].Equipment, current[index].Quantity + quantity);
+                    }
+                }
+                else
+                {
+                    _equipment[equipment.Archetype] = [(equipment, quantity)];
+                    statsCalculated = false;
+                }
+            }
         }
 
-        public Dictionary<string, int> Equipment { get; } = new();
+        private readonly Dictionary<string, List<(Equipment Equipment, int Quantity)>> _equipment = [];
 
+        /// <summary>
+        /// The current inventory of equipment in this division.  Will never be more for any given
+        /// archetype than the NeededEquipment.  Keyed by archetype and then name.  Equipment for
+        /// each archetype is ordered so the most modern kit is first.
+        /// </summary>
+        public IEnumerable<(string archetype, List<(Equipment Equipment, int Quantity)> items)> CurrentEquipment() =>
+            _equipment.Select(e => (archetype: e.Key, items: e.Value.OrderByDescending(x => x.Equipment.Year).ToList()));
+
+        /// <summary>
+        /// The complete list of all equipment needed to fill this template from zero (ignores current
+        /// inventory).  The key represents the archetype and the integer is the count.
+        /// </summary>
         public Dictionary<string, int> NeededEquipment
         {
             get
@@ -100,39 +220,20 @@ namespace Hoi4Engine
                 var result = new Dictionary<string, int>();
                 foreach (var batallion in AllBatallionsAndSupportCompanies())
                 {
-                    foreach (var need in batallion.EquipmentNeed)
+                    foreach (var req in batallion.EquipmentNeed)
                     {
-                        if (result.TryGetValue(need.Key, out var previousNeed))
+                        if (result.TryGetValue(req.Key, out var previousNeed))
                         {
-                            result[need.Key] = previousNeed + need.Value;
+                            result[req.Key] = previousNeed + req.Value;
                         }
                         else
                         {
-                            result[need.Key] = need.Value;
+                            result[req.Key] = req.Value;
                         }
                     }
                 }
                 return result;
             }
         }
-
-        //public void FillEquipment()
-        //{
-        //    Equipment.Clear();
-        //    foreach (var batallion in AllBatallionsAndSupportCompanies())
-        //    {
-        //        foreach (var need in batallion.EquipmentNeed)
-        //        {
-        //            if (Equipment.TryGetValue(need.Key, out var existingAmount))
-        //            {
-        //                Equipment[need.Key] = existingAmount + need.Value;
-        //            }
-        //            else
-        //            {
-        //                Equipment[need.Key] = need.Value;
-        //            }
-        //        }
-        //    }
-        //}
     }
 }
