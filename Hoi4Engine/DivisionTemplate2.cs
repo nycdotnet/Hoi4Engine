@@ -45,6 +45,59 @@ namespace Hoi4Engine
             }
         }
 
+        private decimal _hardAttack;
+        public decimal HardAttack
+        {
+            get
+            {
+                if (!statsCalculated)
+                {
+                    CalculateStats();
+                }
+                return _hardAttack;
+            }
+        }
+
+        private decimal _airAttack;
+        public decimal AirAttack
+        {
+            get
+            {
+                if (!statsCalculated)
+                {
+                    CalculateStats();
+                }
+                return _airAttack;
+            }
+        }
+
+        private decimal _defense;
+        public decimal Defense
+        {
+            get
+            {
+                if (!statsCalculated)
+                {
+                    CalculateStats();
+                }
+                return _defense;
+            }
+        }
+
+        private decimal _breakthrough;
+        public decimal Breakthrough
+        {
+            get
+            {
+                if (!statsCalculated)
+                {
+                    CalculateStats();
+                }
+                return _breakthrough;
+            }
+        }
+
+
         private decimal _averageReliability;
         public decimal AverageReliability
         {
@@ -73,6 +126,8 @@ namespace Hoi4Engine
             foreach (var batallion in AllBatallionsAndSupportCompanies())
             {
                 _softAttack += batallion.SoftAttack;
+                _hardAttack += batallion.HardAttack;
+
                 if (batallion.EssentialEquipment is { Count: > 0})
                 {
                     throw new NotSupportedException("Essential equipment is not yet supported.");
@@ -86,24 +141,44 @@ namespace Hoi4Engine
                         {
                             var e = equip[i];
                             var remainder = e.Quantity - need.Value;
+                            var ratio = 0m;
                             if (remainder >= 0)
                             {
                                 quantityFound += need.Value;
-                                if (e.Equipment.SoftAttack.HasValue)
-                                {
-                                    _softAttack += e.Equipment.SoftAttack.Value;
-                                }
+                                ratio = 1;
                                 equip[i] = (e.Equipment, remainder);
                             }
                             else
                             {
                                 quantityFound += e.Quantity;
-                                if (e.Equipment.SoftAttack.HasValue)
-                                {
-                                    _softAttack += e.Equipment.SoftAttack.Value * e.Quantity / need.Value;
-                                }
+                                ratio = (decimal)e.Quantity / need.Value;
                                 equip[i] = (e.Equipment, 0);
                             }
+
+                            if (ratio != 0)
+                            {
+                                if (e.Equipment.SoftAttack.HasValue)
+                                {
+                                    _softAttack += e.Equipment.SoftAttack.Value * ratio;
+                                }
+                                if (e.Equipment.HardAttack.HasValue)
+                                {
+                                    _hardAttack += e.Equipment.HardAttack.Value * ratio;
+                                }
+                                if (e.Equipment.AirAttack.HasValue)
+                                {
+                                    _airAttack += e.Equipment.AirAttack.Value * ratio;
+                                }
+                                if (e.Equipment.Defense.HasValue)
+                                {
+                                    _defense += e.Equipment.Defense.Value * ratio;
+                                }
+                                if (e.Equipment.Breakthrough.HasValue)
+                                {
+                                    _breakthrough += e.Equipment.Breakthrough.Value * ratio;
+                                }
+                            }
+
                             if (quantityFound == need.Value)
                             {
                                 break;
@@ -112,10 +187,15 @@ namespace Hoi4Engine
                     }
                 }
             }
+            statsCalculated = true;
 
             void ResetStats()
             {
                 _softAttack = 0;
+                _hardAttack = 0;
+                _airAttack = 0;
+                _defense = 0;
+                _breakthrough = 0;
             }
         }
 

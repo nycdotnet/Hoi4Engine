@@ -119,50 +119,49 @@ namespace Hoi4EngineTests
             template.AverageReliability.Should().Be(1m);
         }
 
-        //[Fact]
-        //public void SingleInfantryBatallionWithInfantryEquipmentIHasExpectedStats()
-        //{
-        //    var parsingContext = new Hoi4ParsingContext();
-        //    var infEquipI = parsingContext.GetInfantryEquipment().Single(x => x.Name == "infantry_equipment_1");
-        //    var infantryBatallion = parsingContext.GetInfantryBatallions().Single(x => x.Name == "infantry");
+        [Fact]
+        public void SingleInfantryBatallionWithInfantryEquipmentIHasExpectedStats()
+        {
+            var infantryEquipment = new InfantryEquipment();
+            var infantry = new Infantry();
+            var infantryEquipmentI = infantryEquipment.Single(x => x.Name == "infantry_equipment_1");
+            var infantryBatallion = infantry.Single(x => x.Name == "infantry");
 
-        //    var template = new DivisionTemplate();
-        //    //var bat = new EquipedBattalion(infantryBatallion);
-        //    //bat.SetFullEquipment(infEquipI);
+            var template = new DivisionTemplate2();
+            template.AddToBrigade1(infantryBatallion);
+            template.AddEquipment(infantryEquipmentI, 100);
 
-        //    //template.AddToBrigade1(bat);
+            //template.MaxSpeed.Should().Be(4);
+            //template.HP.Should().Be(25);
+            //template.Organization.Should().Be(60);
+            //template.RecoveryRate.Should().Be(0.3m);
+            //template.Reconnaisance.Should().Be(0);
+            //template.Suppression.Should().Be(1.5m);
+            //template.Weight.Should().Be(0.5m);
+            //template.SupplyUse.Should().Be(0.06m);
+            //template.AverageReliability.Should().Be(0.9m);
+            //template.ReliabilityBonus.Should().Be(0);
+            //template.TricklebackAndWarSupportProtection.Should().Be(0);
+            //template.ExperienceLoss.Should().Be(0);
 
-        //    //template.MaxSpeed.Should().Be(4);
-        //    //template.HP.Should().Be(25);
-        //    //template.Organization.Should().Be(60);
-        //    //template.RecoveryRate.Should().Be(0.3m);
-        //    //template.Reconnaisance.Should().Be(0);
-        //    //template.Suppression.Should().Be(1.5m);
-        //    //template.Weight.Should().Be(0.5m);
-        //    //template.SupplyUse.Should().Be(0.06m);
-        //    //template.AverageReliability.Should().Be(0.9m);
-        //    //template.ReliabilityBonus.Should().Be(0);
-        //    //template.TricklebackAndWarSupportProtection.Should().Be(0);
-        //    //template.ExperienceLoss.Should().Be(0);
-
-        //    //template.SoftAttack.Should().Be(6);
-        //    //template.HardAttack.Should().Be(1);
-        //    //template.AirAttack.Should().Be(0);
-        //    //template.Defense.Should().Be(22);
-        //    //template.Breakthrough.Should().Be(3);
-        //    //template.Armor.Should().Be(0);
-        //    //template.Piercing.Should().Be(4);
-        //    //template.Initiative.Should().Be(0);
-        //    //template.Entrenchment.Should().Be(0);
-        //    //template.EquipmentCaptureRatio.Should().Be(0);
-        //    //template.Manpower.Should().Be(1000);
-        //    //template.TrainingTime.Should().Be(90);
-        //    //template.FuelUsage.Should().Be(0);
-        //    //template.FuelCapacity.Should().Be(0);
-        //    //template.InfantryEquipment.Should().Be(100);
-        //    //template.ProductionCost.Should().Be(50);
-        //    //template.CombatWidth.Should().Be(2);
-        //}
+            template.SoftAttack.Should().Be(6);
+            template.HardAttack.Should().Be(1);
+            template.AirAttack.Should().Be(0);
+            template.Defense.Should().Be(22);
+            template.Breakthrough.Should().Be(3);
+            //template.Armor.Should().Be(0);
+            //template.Piercing.Should().Be(4);
+            //template.Initiative.Should().Be(0);
+            //template.Entrenchment.Should().Be(0);
+            //template.EquipmentCaptureRatio.Should().Be(0);
+            //template.Manpower.Should().Be(1000);
+            //template.TrainingTime.Should().Be(90);
+            //template.FuelUsage.Should().Be(0);
+            //template.FuelCapacity.Should().Be(0);
+            //template.InfantryEquipment.Should().Be(100);
+            //template.ProductionCost.Should().Be(50);
+            //template.CombatWidth.Should().Be(2);
+        }
 
         //[Fact]
         //public void TwoInfantryBatallionHasExpectedStats()
