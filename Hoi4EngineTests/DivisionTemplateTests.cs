@@ -89,35 +89,35 @@ namespace Hoi4EngineTests
                 .items.Single(e => e.Equipment.Name == "infantry_equipment_3").Quantity.Should().Be(60);
         }
 
-        //[Fact]
-        //public void WhenThereAreZeroOfAnEquipmentKindItIsIgnoredForReliability()
-        //{
-        //    var parsingContext = new Hoi4ParsingContext();
-        //    var basicInfEq = parsingContext.GetInfantryEquipment().Single(x => x.Name == "infantry_equipment_0");
-        //    var advancedInfEq = parsingContext.GetInfantryEquipment().Single(x => x.Name == "infantry_equipment_3");
-        //    var infantryBatallion = parsingContext.GetInfantryBatallions().Single(x => x.Name == "infantry");
+        [Fact]
+        public void WhenThereAreZeroOfAnEquipmentKindItIsIgnoredForReliability()
+        {
+            var infantryEquipment = new InfantryEquipment();
+            var infantry = new Infantry();
+            var basicInfEq = infantryEquipment.Single(x => x.Name == "infantry_equipment_0");
+            var advancedInfEq = infantryEquipment.Single(x => x.Name == "infantry_equipment_3");
+            var infantryBatallion = infantry.Single(x => x.Name == "infantry");
 
-        //    //var bat = new EquipedBattalion(infantryBatallion);
-        //    //bat.AddEquipment(basicInfEq, 0);
-        //    //bat.AddEquipment(advancedInfEq, 0);
-        //    //bat.InfantryEquipmentCount.Should().Be(0);
+            var template = new DivisionTemplate2();
+            template.AddToBrigade1(infantryBatallion);
+            template.AddEquipment(basicInfEq, 0);
+            template.AddEquipment(advancedInfEq, 0);
 
-        //    //var batallionEquipment = bat.GetEquipment().ToArray();
-        //    //batallionEquipment.Should().HaveCount(1);
-        //    //batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory.Should().HaveCount(2);
-        //    //batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory
-        //    //    .Single(i => i.Equipment.Name == "infantry_equipment_0").Equipment.Reliability.Should().Be(0.9m);
-        //    //batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory
-        //    //    .Single(i => i.Equipment.Name == "infantry_equipment_0").Quantity.Should().Be(0);
-        //    //batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory
-        //    //    .Single(i => i.Equipment.Name == "infantry_equipment_3").Equipment.Reliability.Should().Be(0.8m);
-        //    //batallionEquipment.Single(e => e.Archetype == "infantry_equipment").Inventory
-        //    //    .Single(i => i.Equipment.Name == "infantry_equipment_3").Quantity.Should().Be(0);
+            var currentEquipment = template.CurrentEquipment().ToList();
+            currentEquipment.Single(e => e.archetype == "infantry_equipment")
+                .items.Sum(e => e.Quantity).Should().Be(0);
 
-        //    //var template = new DivisionTemplate();
-        //    //template.AddToBrigade1(bat);
-        //    //template.AverageReliability.Should().Be(1m);
-        //}
+            currentEquipment.Single(e => e.archetype == "infantry_equipment")
+                .items.Single(e => e.Equipment.Name == "infantry_equipment_0").Quantity.Should().Be(0);
+            currentEquipment.Single(e => e.archetype == "infantry_equipment")
+                .items.Single(e => e.Equipment.Name == "infantry_equipment_0").Equipment.Reliability.Should().Be(0.9m);
+            currentEquipment.Single(e => e.archetype == "infantry_equipment")
+                .items.Single(e => e.Equipment.Name == "infantry_equipment_3").Quantity.Should().Be(0);
+            currentEquipment.Single(e => e.archetype == "infantry_equipment")
+                .items.Single(e => e.Equipment.Name == "infantry_equipment_3").Equipment.Reliability.Should().Be(0.8m);
+
+            template.AverageReliability.Should().Be(1m);
+        }
 
         //[Fact]
         //public void SingleInfantryBatallionWithInfantryEquipmentIHasExpectedStats()

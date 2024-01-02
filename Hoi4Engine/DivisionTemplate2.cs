@@ -58,11 +58,6 @@ namespace Hoi4Engine
             }
         }
 
-        private void ResetStats()
-        {
-            _softAttack = 0;
-        }
-
         private void CalculateStats()
         {
             ResetStats();
@@ -116,6 +111,11 @@ namespace Hoi4Engine
                         }
                     }
                 }
+            }
+
+            void ResetStats()
+            {
+                _softAttack = 0;
             }
         }
 
